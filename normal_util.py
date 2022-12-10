@@ -1,6 +1,66 @@
+import os
+import sys
 import torch
 import numpy as np
 import cv2
+
+from skimage.transform import resize
+
+dir_path = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(dir_path)
+
+from general import round_32
+
+def load_omni_model(omni_dir):
+
+    sys.path.append(omni_dir)
+
+    omni_model_dir = f'{omni_dir}/omnidata_tools/torch/pretrained_models/'
+    
+    from omnidata_tools.torch.modules.midas.dpt_depth import DPTDepthModel
+    from omnidata_tools.torch.data.transforms import get_transform
+
+    image_size = 384
+    
+    pretrained_weights_path = omni_model_dir + 'omnidata_dpt_normal_v2.ckpt'
+    model = DPTDepthModel(backbone='vitb_rn50_384', num_channels=3) # DPT Hybrid
+    checkpoint = torch.load(pretrained_weights_path, map_location='cuda')
+
+    if 'state_dict' in checkpoint:
+        state_dict = {}
+        for k, v in checkpoint['state_dict'].items():
+            state_dict[k[6:]] = v
+    else:
+        state_dict = checkpoint
+
+    model.load_state_dict(state_dict)
+    model.to('cuda')
+    
+    return model
+
+def get_omni_normals(model, img, zero_one=True):
+    
+    h, w, _ = img.shape
+
+    img = resize(img, (round_32(h), round_32(w)), anti_aliasing=True)
+    img_tensor = torch.from_numpy(img).permute(2, 0, 1).to('cuda')
+
+    if img_tensor.shape[1] == 1:
+        img_tensor = img_tensor.repeat_interleave(3,1)
+    
+    with torch.no_grad():
+        output = model(img_tensor.unsqueeze(0)).clamp(min=0, max=1)[0]
+        output[1, :, :] = 1 - output[1, :, :]
+        output[2, :, :] = 1 - output[2, :, :]
+        
+        if not zero_one:
+            output = (output * 2.0) - 1.0
+
+        np_out = output.permute(1, 2, 0).detach().cpu().numpy()
+        
+    np_out = resize(np_out, (h, w), anti_aliasing=True)
+    
+    return np_out
 
 def prediction_to_normal(pred):
     # x, y = pred[:, 0, :, :], pred[:, 1, :, :]

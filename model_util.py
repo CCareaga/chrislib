@@ -3,11 +3,11 @@ from os.path import dirname, abspath
 import torch
 from pathlib import Path
 
-parent_path = dirname(dirname(abspath(__file__)))
+parent_path = dirname(abspath(__file__))
 sys.path.append(parent_path)
 
-from networks.altered_midas.midas_net import MidasNet
-from networks.altered_midas.midas_net_custom import MidasNet_small
+from altered_midas.midas_net import MidasNet
+from altered_midas.midas_net_custom import MidasNet_small
 
 def load_models(
     ord_path='/home/chris/research/intrinsic/boosted_shading/results/final_weights/vivid_bird_318_300.pt',

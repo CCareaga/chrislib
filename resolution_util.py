@@ -3,8 +3,12 @@ import skimage
 import cv2
 import numpy as np
 
-sys.path.append('../')
-from common.general import round_32
+from os.path import dirname, abspath
+
+parent_path = dirname(abspath(__file__))
+sys.path.append(parent_path)
+
+from general import round_32
 
 def resizewithpool(img, size):
     i_size = img.shape[0]
