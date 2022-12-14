@@ -14,7 +14,7 @@ class MidasNet_small(BaseModel):
     """
 
     def __init__(self, activation='sigmoid', path=None, features=64, backbone="efficientnet_lite3", exportable=True, channels_last=False, align_corners=True,
-        blocks={'expand': True}, input_channels=3, output_channels=1):
+        blocks={'expand': True}, input_channels=3, output_channels=1, out_bias=0):
         """Init.
 
         Args:
@@ -71,6 +71,7 @@ class MidasNet_small(BaseModel):
             nn.Conv2d(32, output_channels, kernel_size=1, stride=1, padding=0),
             output_act
         )
+        self.scratch.output_conv[-2].bias = torch.nn.Parameter(torch.ones(output_channels) * out_bias)
         
         if path:
             self.load(path)
