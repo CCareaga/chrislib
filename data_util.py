@@ -48,16 +48,6 @@ def get_tonemap_scale(rgb_color, p=90):
 
     return scale
 
-def get_brightness(rgb, mode='numpy'):
-
-    # "CCIR601 YIQ" method for computing brightness
-    if mode == 'numpy':
-        brightness = (0.3 * rgb[:,:,0]) + (0.59 * rgb[:,:,1]) + (0.11 * rgb[:,:,2])
-        return brightness[:, :, np.newaxis]
-    if mode == 'torch':
-        brightness = (0.3 * rgb[0,:,:]) + (0.59 * rgb[1,:,:]) + (0.11 * rgb[2, :,:])
-        return brightness.unsqueeze(0)
-
 def np_to_pil(img):
     """ converts a [0-1] numpy array into a PIL image """
     int_img = (img * 255).astype(np.uint8)

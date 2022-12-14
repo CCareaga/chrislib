@@ -174,3 +174,41 @@ def estimatemidas(img, midasmodel, msize, device='cuda'):
         prediction = 0
 
     return prediction
+
+def write_depth(path, depth, bits=1 , colored=False):
+    """Write depth map to pfm and png file.
+    Args:
+        path (str): filepath without extension
+        depth (array): depth
+    """
+    # write_pfm(path + ".pfm", depth.astype(np.float32))
+    if colored == True:
+        bits = 1
+
+    depth_min = depth.min()
+    depth_max = depth.max()
+
+    max_val = (2**(8*bits))-1
+    # if depth_max>max_val:
+    #     print('Warning: Depth being clipped')
+    #
+    # if depth_max - depth_min > np.finfo("float").eps:
+    #     out = depth
+    #     out [depth > max_val] = max_val
+    # else:
+    #     out = 0
+
+    if depth_max - depth_min > np.finfo("float").eps:
+        out = max_val * (depth - depth_min) / (depth_max - depth_min)
+    else:
+        out = 0
+
+    if bits == 1 or colored:
+        out = out.astype("uint8")
+        if colored:
+            out = cv2.applyColorMap(out,cv2.COLORMAP_INFERNO)
+        cv2.imwrite(path+'.png', out)
+    elif bits == 2:
+        cv2.imwrite(path+'.png', out.astype("uint16"))
+
+    return

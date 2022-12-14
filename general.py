@@ -119,9 +119,13 @@ def show(img, size=(16, 9), save=None):
     plt.imshow(img)
     plt.axis('off')
 
-def match_scale(pred, grnd, mask=None, skip_close=False, threshold=0.001):
+def match_scale(pred, grnd, mask=None, skip_close=False, threshold=0.001, subsample=1.0):
     if mask is None:
         mask = np.ones(pred.shape[:2]).astype(bool)
+
+    if subsample != 1.0:
+        rand_mask = np.random.randn(*mask.shape) > (1.0 - subsample)
+        mask &= rand_mask
 
     flat_pred = pred[mask].reshape(-1)
     flat_grnd = grnd[mask].reshape(-1)
@@ -132,6 +136,25 @@ def match_scale(pred, grnd, mask=None, skip_close=False, threshold=0.001):
         return scale
 
     return scale * pred
+
+def get_scale(a, b, mask=None, subsample=1.0):
+    if mask is None:
+        mask = np.ones(pred.shape[:2])
+
+    mask = mask.astype(bool)
+
+    if subsample != 1.0:
+        rand_mask = np.random.randn(*mask.shape) > (1.0 - subsample)
+        mask &= rand_mask
+
+    mask = mask.reshape(-1)
+    flat_a = a.reshape(-1)[mask]
+    flat_b = b.reshape(-1)[mask]
+
+    scale, _, _, _ = np.linalg.lstsq(a.reshape(-1, 1), b.reshape(-1, 1), rcond=None)
+
+    return scale
+
 
 def get_brightness(rgb, mode='numpy'):
 
