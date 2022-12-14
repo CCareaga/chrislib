@@ -83,8 +83,11 @@ def tile_imgs(images, text=None, font_size=16, font_file="/usr/share/fonts/truet
     else:
         if not isinstance(text[0], list):
             text = [text]
-        
-    font = ImageFont.truetype(font_file, font_size)
+    
+    try:
+        font = ImageFont.truetype(font_file, font_size)
+    except:
+        font = None
 
     width = sum([border + x.shape[1] for x in images[0]]) + border
     border_pix = np.ones((border, width, 3))
@@ -133,7 +136,7 @@ def match_scale(pred, grnd, mask=None, skip_close=False, threshold=0.001, subsam
     scale, _, _, _ = np.linalg.lstsq(flat_pred.reshape(-1, 1), flat_grnd, rcond=None)
     
     if skip_close and abs(1.0 - scale) < threshold:
-        return scale
+        return pred
 
     return scale * pred
 
@@ -187,8 +190,8 @@ def to2np(img):
 def view_scale(img, p=100):
     return (img / np.percentile(img, p)).clip(0, 1)
 
-def view(img, perc=100):
-    return view_scale(img ** (1/2.2), p=perc)
+def view(img, p=100):
+    return view_scale(img ** (1/2.2), p=p)
 
 def to2np(img):
     return img.detach().cpu().permute(1, 2, 0).numpy()
