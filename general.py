@@ -196,6 +196,12 @@ def view(img, p=100):
 def to2np(img):
     return img.detach().cpu().permute(1, 2, 0).numpy()
 
+def invert(x):
+    return 1.0 / (x + 1.0)
+
+def uninvert(x, eps=0.001):
+    return (1.0 / x.clip(eps)) - 1.0
+
 # GUIDED FILTER
 def box(img, r):
     """ O(1) box filter

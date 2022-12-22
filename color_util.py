@@ -1,5 +1,7 @@
 import numpy as np
 
+from .general import invert, uninvert
+
 def get_brightness(rgb, mode='numpy'):
 
     # "CCIR601 YIQ" method for computing brightness
@@ -37,3 +39,49 @@ def yuv2rgb(yuv, clip=True):
         rgb = rgb.clip(0, 1)
         
     return rgb
+
+def rgb2luv(rgb, eps=0.001):
+
+    r = rgb[:, :, 0]
+    g = rgb[:, :, 1]
+    b = rgb[:, :, 2]
+
+    l = (r * 0.299) + (g * 0.587) + (b * 0.114)
+    u = invert(r / (g + eps))
+    v = invert(b / (g + eps))
+
+    return np.stack((l, u, v), axis=-1)
+
+def luv2rgb(luv, eps=0.001):
+
+    l = luv[:, :, 0]
+    u = uninvert(luv[:, :, 1], eps=eps)
+    v = uninvert(luv[:, :, 2], eps=eps)
+
+    g = l / ((u * 0.299) + (v * 0.114) + 0.587)
+    r = g * u
+    b = g * v
+
+    return np.stack((r, g, b), axis=-1)
+
+def batch_rgb2luv(rgb, eps=0.001):
+    r = rgb[:, 0, :, :]
+    g = rgb[:, 1, :, :]
+    b = rgb[:, 2, :, :]
+
+    l = (r * 0.299) + (g * 0.587) + (b * 0.114)
+    u = invert(r / (g + eps))
+    v = invert(b / (g + eps))
+
+    return torch.stack((l, u, v), axis=1)
+
+def batch_luv2rgb(luv, eps=0.001):
+    l = luv[:, 0, :, :]
+    u = uninvert(luv[:, 1, :, :], eps=eps)
+    v = uninvert(luv[:, 2, :, :], eps=eps)
+
+    g = l / ((u * 0.299) + (v * 0.114) + 0.587)
+    r = g * u
+    b = g * v
+
+    return torch.stack((r, g, b), axis=1)
