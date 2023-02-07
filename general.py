@@ -197,10 +197,15 @@ def to2np(img):
     return img.detach().cpu().permute(1, 2, 0).numpy()
 
 def invert(x):
-    return 1.0 / (x + 1.0)
+    out = 1.0 / (x + 1.0)
+    return out
 
-def uninvert(x, eps=0.001):
-    return (1.0 / x.clip(eps)) - 1.0
+def uninvert(x, eps=0.001, clip=True):
+    if clip:
+        x = x.clip(eps, 1.0)
+
+    out = (1.0 / x) - 1.0
+    return out
 
 # GUIDED FILTER
 def box(img, r):
