@@ -6,6 +6,7 @@ import skimage
 import cv2
 import scipy as sp
 import scipy.ndimage
+import torch
 
 import matplotlib.pyplot as plt
 from PIL import Image, ImageDraw, ImageFont

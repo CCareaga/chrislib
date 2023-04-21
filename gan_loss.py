@@ -2,6 +2,14 @@ import torch
 import torch.nn as nn
 import functools
 
+def set_grad(nets, requires_grad):
+    if not isinstance(nets, list):
+        nets = [nets]
+    for net in nets:
+        if net is not None:
+            for param in net.parameters():
+                param.requires_grad = requires_grad
+
 def get_norm_layer(norm_type='instance'):
     """Return a normalization layer
     Parameters:
