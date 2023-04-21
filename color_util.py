@@ -87,6 +87,30 @@ def batch_luv2rgb(luv, eps=0.001):
 
     return torch.stack((r, g, b), axis=1)
 
+def batch_rgb2iuv(rgb, eps=0.001):
+    r = rgb[:, 0, :, :]
+    g = rgb[:, 1, :, :]
+    b = rgb[:, 2, :, :]
+
+    l = (r * 0.299) + (g * 0.587) + (b * 0.114)
+
+    i = invert(l)
+    u = invert(r / (g + eps))
+    v = invert(b / (g + eps))
+
+    return torch.stack((i, u, v), axis=1)
+
+def batch_iuv2rgb(iuv, eps=0.001):
+    l = uninvert(iuv[:, 0, :, :], eps=eps)
+    u = uninvert(iuv[:, 1, :, :], eps=eps)
+    v = uninvert(iuv[:, 2, :, :], eps=eps)
+
+    g = l / ((u * 0.299) + (v * 0.114) + 0.587)
+    r = g * u
+    b = g * v
+
+    return torch.stack((r, g, b), axis=1)
+
 
 DISTINCT_COLORS = np.array(
     [(int(s[0:2], 16), int(s[2:4], 16), int(s[4:6], 16)) for s in [
