@@ -1,4 +1,5 @@
 import os
+import sys
 import random
 from PIL import Image
 import numpy as np
@@ -17,36 +18,12 @@ def load_from_url(url):
 def load_image(path):
     return np.array(Image.open(path)).astype(np.float32) / 255.
 
-def load_depth(path):
+def load_depth(path, bit_depth=16):
     depth = Image.open(path)
     depth_arr = np.array(depth).astype(np.float32)
-    depth_arr = depth_arr / (2**16)
+    depth_arr = depth_arr / (2**bit_depth)
 
     return depth_arr.astype(np.float32)
-
-def get_tonemap_scale(rgb_color, p=90):
-    gamma                             = 1.0 / 2.2   # standard gamma correction exponent
-    inv_gamma                         = 1.0 / gamma
-    # percentile                        = 90        # we want this percentile brightness value in the unmodified image...
-    brightness_nth_percentile_desired = 0.8       # ...to be this bright after scaling
-
-    brightness       = get_brightness(rgb_color)
-    # brightness_valid = brightness[valid_mask]
-
-    eps                               = 0.0001 # if the kth percentile brightness value in the unmodified image is less than this, set the scale to 0.0 to avoid divide-by-zero
-    brightness_nth_percentile_current = np.percentile(brightness, p)
-
-    if brightness_nth_percentile_current < eps:
-        scale = 0.0
-    else:
-        # Snavely uses the following expression in the code at https://github.com/snavely/pbrs_tonemapper/blob/master/tonemap_rgbe.py:
-        # scale = np.exp(np.log(brightness_nth_percentile_desired)*inv_gamma - np.log(brightness_nth_percentile_current))
-        #
-        # Our expression below is equivalent, but is more intuitive, because it follows more directly from the expression:
-        # (scale*brightness_nth_percentile_current)^gamma = brightness_nth_percentile_desired
-        scale = np.power(brightness_nth_percentile_desired, inv_gamma) / brightness_nth_percentile_current
-
-    return scale
 
 def np_to_pil(img):
     """ converts a [0-1] numpy array into a PIL image """

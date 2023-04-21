@@ -8,8 +8,10 @@ import scipy as sp
 import scipy.ndimage
 import torch
 
+
 import matplotlib.pyplot as plt
 from PIL import Image, ImageDraw, ImageFont
+from skimage.transform import resize
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(dir_path)
@@ -64,7 +66,7 @@ def _tile_row(images, text, border, font, font_pos, font_color, text_box):
     concat = np.concatenate(elements, axis=1)
     return concat
 
-def tile_imgs(images, text=None, font_size=16, font_file="/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+def tile_imgs(images, rescale=1.0, text=None, font_size=16, font_file="/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
               font_color=None, font_pos=(0, 0), text_box=None, display=False, save=None, border=20, cmap='viridis', quality=75):
     
     if not isinstance(images, list):
@@ -101,6 +103,10 @@ def tile_imgs(images, text=None, font_size=16, font_file="/usr/share/fonts/truet
         rows.append(border_pix)
 
     tiled = np.concatenate(rows, axis=0)
+
+    if rescale != 1.0:
+        h, w, _ = tiled.shape
+        tiled = resize(tiled, (int(h * rescale), int(w * rescale)))
 
     if display:
         plt.figure(figsize=(len(images[0]), len(images)))
@@ -207,6 +213,31 @@ def uninvert(x, eps=0.001, clip=True):
 
     out = (1.0 / x) - 1.0
     return out
+
+
+def get_tonemap_scale(rgb_color, p=90):
+    gamma                             = 1.0 / 2.2   # standard gamma correction exponent
+    inv_gamma                         = 1.0 / gamma
+    # percentile                        = 90        # we want this percentile brightness value in the unmodified image...
+    brightness_nth_percentile_desired = 0.8       # ...to be this bright after scaling
+
+    brightness       = get_brightness(rgb_color)
+    # brightness_valid = brightness[valid_mask]
+
+    eps                               = 0.0001 # if the kth percentile brightness value in the unmodified image is less than this, set the scale to 0.0 to avoid divide-by-zero
+    brightness_nth_percentile_current = np.percentile(brightness, p)
+
+    if brightness_nth_percentile_current < eps:
+        scale = 0.0
+    else:
+        # Snavely uses the following expression in the code at https://github.com/snavely/pbrs_tonemapper/blob/master/tonemap_rgbe.py:
+        # scale = np.exp(np.log(brightness_nth_percentile_desired)*inv_gamma - np.log(brightness_nth_percentile_current))
+        #
+        # Our expression below is equivalent, but is more intuitive, because it follows more directly from the expression:
+        # (scale*brightness_nth_percentile_current)^gamma = brightness_nth_percentile_desired
+        scale = np.power(brightness_nth_percentile_desired, inv_gamma) / brightness_nth_percentile_current
+
+    return scale
 
 # GUIDED FILTER
 def box(img, r):
