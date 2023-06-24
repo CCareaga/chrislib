@@ -7,12 +7,13 @@ from .resolution_util import optimal_resize
 from .general import round_32
 
 
-def run_pipeline(models, img_arr, output_ordinal=False, resize_conf=None, base_size=384, maintain_size=False, linear=False, device='cuda', lstsq_p=0.0):
+def run_pipeline(models, img_arr, output_ordinal=False, resize_conf=None, base_size=384, maintain_size=False, linear=False, device='cuda', lstsq_p=0.0, full_only=False):
     # models - models dictionary returned by load_models()
     # img_arr - RGB input image as numpy array between 0-1
     # output_ordinal - whether or not to output intermediate ordinal estimations
     # resize_conf - (optional) confidence to use for resizing (between 0-1) if None maintain original size
     # maintain_size- (optional) whether or not the results match the input image size
+    # full_only - flag to only use full size ordinal estimation (for ablation)
     # device - string representing device to use for pipeline
     
     results = {}
@@ -61,8 +62,12 @@ def run_pipeline(models, img_arr, output_ordinal=False, resize_conf=None, base_s
         inp = torch.from_numpy(lin_img).permute(2, 0, 1).to(device)
         bse = torch.from_numpy(ord_base).permute(2, 0, 1).to(device)
         fll = torch.from_numpy(ord_full).permute(2, 0, 1).to(device)
+        
+        if full_only:
+            combined = torch.cat((inp, fll), 0).unsqueeze(0)
+        else:
+            combined = torch.cat((inp, bse, fll), 0).unsqueeze(0)
 
-        combined = torch.cat((inp, bse, fll), 0).unsqueeze(0)
         inv_shd = models['real_model'](combined)
         
         shd = ((1.0 / inv_shd) - 1.0)
