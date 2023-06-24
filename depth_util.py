@@ -1,7 +1,8 @@
 import sys
 import os
 
-curr_path = '/home/chris/research/intrinsic/misc'
+# curr_path = '/home/chris/research/intrinsic/misc'
+curr_path = '/project/aksoy-lab/chris/misc'
 sys.path.append(curr_path)
 
 # OUR
@@ -35,7 +36,7 @@ GPU_threshold = 1600 - 32 # Limit for the GPU (NVIDIA RTX 2080), can be adjusted
 def create_depth_models(device='cuda', midas_path=None, pix2pix_path=None):
     
     # opt = TestOptions().parse()
-    opt = Namespace(Final=False, R0=False, R20=False, aspect_ratio=1.0, batch_size=1, checkpoints_dir=f'{curr_path}/BoostingMonocularDepth/pix2pix/checkpoints', colorize_results=False, crop_size=672, data_dir=None, dataroot=None, dataset_mode='depthmerge', depthNet=None, direction='AtoB', display_winsize=256, epoch='latest', eval=False, generatevideo=None, gpu_ids=[0], init_gain=0.02, init_type='normal', input_nc=2, isTrain=False, load_iter=0, load_size=672, max_dataset_size=10000, max_res=float('inf'), model='pix2pix4depth', n_layers_D=3, name='mergemodel', ndf=64, netD='basic', netG='unet_1024', net_receptive_field_size=None, ngf=64, no_dropout=False, no_flip=False, norm='none', num_test=50, num_threads=4, output_dir=None, output_nc=1, output_resolution=None, phase='test', pix2pixsize=None, preprocess='resize_and_crop', savecrops=None, savewholeest=None, serial_batches=False, suffix='', verbose=False)
+    opt = Namespace(Final=False, R0=False, R20=False, aspect_ratio=1.0, batch_size=1, checkpoints_dir=f'{curr_path}/BoostingMonocularDepth/pix2pix/checkpoints', colorize_results=False, crop_size=672, data_dir=None, dataroot=None, dataset_mode='depthmerge', depthNet=None, direction='AtoB', display_winsize=256, epoch='latest', eval=True, generatevideo=None, gpu_ids=[0], init_gain=0.02, init_type='normal', input_nc=2, isTrain=False, load_iter=0, load_size=672, max_dataset_size=10000, max_res=float('inf'), model='pix2pix4depth', n_layers_D=3, name='mergemodel', ndf=64, netD='basic', netG='unet_1024', net_receptive_field_size=None, ngf=64, no_dropout=False, no_flip=False, norm='none', num_test=50, num_threads=4, output_dir=None, output_nc=1, output_resolution=None, phase='test', pix2pixsize=None, preprocess='resize_and_crop', savecrops=None, savewholeest=None, serial_batches=False, suffix='', verbose=False)
     # opt = Namespace()
     # opt.gpu_ids = [0]
     # opt.isTrain = False
@@ -70,8 +71,8 @@ def get_depth(img, models, threshold=0.2):
 
     # Generate mask used to smoothly blend the local pathc estimations to the base estimate.
     # It is arbitrarily large to avoid artifacts during rescaling for each crop.
-    mask_org = generatemask((3000, 3000))
-    mask = mask_org.copy()
+    # mask_org = generatemask((3000, 3000))
+    # mask = mask_org.copy()
 
     # Value x of R_x defined in the section 5 of the main paper.
     r_threshold_value = threshold
@@ -108,7 +109,7 @@ def doubleestimate(img, size1, size2, pix2pixsize, pix2pixmodel, midasmodel):
     estimate2 = singleestimate(img, size2, midasmodel)
     # Resize to the inference size of merge network.
     estimate2 = cv2.resize(estimate2, (pix2pixsize, pix2pixsize), interpolation=cv2.INTER_CUBIC)
-
+    
     # Inference on the merge model
     pix2pixmodel.set_input(estimate1, estimate2)
     pix2pixmodel.test()

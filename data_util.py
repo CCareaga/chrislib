@@ -15,8 +15,9 @@ def load_from_url(url):
     response = requests.get(url)
     return load_image(BytesIO(response.content))
 
-def load_image(path):
-    return np.array(Image.open(path)).astype(np.float32) / 255.
+def load_image(path, bits=8):
+    np_arr = np.array(Image.open(path)).astype(np.float32) 
+    return np_arr / float((2 ** bits) - 1)
 
 def load_depth(path, bit_depth=16):
     depth = Image.open(path)
@@ -25,9 +26,13 @@ def load_depth(path, bit_depth=16):
 
     return depth_arr.astype(np.float32)
 
-def np_to_pil(img):
+def np_to_pil(img, bits=8):
     """ converts a [0-1] numpy array into a PIL image """
-    int_img = (img * 255).astype(np.uint8)
+    if bits == 8:
+        int_img = (img * 255).astype(np.uint8)
+    if bits == 16:
+        int_img = (img * ((2 ** 16) - 1)).astype(np.uint16)
+
     return Image.fromarray(int_img)
 
 def random_color_jitter(img):

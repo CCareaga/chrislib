@@ -4,6 +4,16 @@ import torchvision.transforms.functional as TF
 import torch
 import numpy as np
 
+def lp_loss(pred, grnd, mask, p=2):
+    # NOTE: assumes the mask is B x 1 x H x W
+                       
+    if p == 1:
+        lp_term = torch.nn.functional.l1_loss(pred, grnd, reduction='none') * mask
+    if p == 2:
+        lp_term = torch.nn.functional.mse_loss(pred, grnd, reduction='none') * mask
+                       
+    return lp_term.sum() / (mask.sum() * lp_term.shape[1])
+
 class MSGLoss():
     def __init__(self, scales=4, taps=[1, 1, 1, 1], k_size=[3, 3, 3, 3], device=None):
         self.n_scale = scales
@@ -67,6 +77,7 @@ class MSGLoss():
             # blurred = TF.gaussian_blur(img, self.k_size[scale])
             # scaled = blurred[:, :, ::2**scale, ::2**scale]
             # blurred = img
+
             # NOTE: interpolate is noticeably faster than blur and sub-sample
             scaled = torch.nn.functional.interpolate(img, scale_factor=1/(2**scale), mode='bilinear', align_corners=True, antialias=True)
             return scaled
@@ -76,7 +87,7 @@ class MSGLoss():
         grad_x, grad_y = self.imgDerivative(diff, self.taps[scale])
 
         # B x C x H x W
-        grad_magnitude = torch.sqrt(torch.pow(grad_x, 2) + torch.pow(grad_y, 2))
+        grad_magnitude = torch.sqrt(torch.pow(grad_x, 2) + torch.pow(grad_y, 2) + 0.001)
 
         return grad_magnitude
 
@@ -122,3 +133,4 @@ class ImageDerivative():
         grad_y = kn_filters.filter2d_separable(img, d1, p, border_type='reflect', normalized=False, padding='same')
 
         return (grad_x, grad_y)
+
