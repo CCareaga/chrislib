@@ -28,8 +28,7 @@ def full_resize(img):
     net_input = resize(img, (new_h, new_w, 3), anti_aliasing=True)
     return net_input
 
-def equalize_predictions(img, base, full, p=0.5):
-
+def equalize_predictions(img, base, full, use_full=False, p=0.5):
     h, w, _ = img.shape
 
     full_shd = (1. / full.clip(1e-5)) - 1.
