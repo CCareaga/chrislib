@@ -7,13 +7,13 @@ from .resolution_util import optimal_resize
 from .general import round_32
 
 
-def run_pipeline(models, img_arr, output_ordinal=False, resize_conf=None, base_size=384, maintain_size=False, linear=False, device='cuda', lstsq_p=0.0, full_only=False):
+def run_pipeline(models, img_arr, output_ordinal=False, resize_conf=None, base_size=384, maintain_size=False, linear=False, device='cuda', lstsq_p=0.0, inputs='all'):
     # models - models dictionary returned by load_models()
     # img_arr - RGB input image as numpy array between 0-1
     # output_ordinal - whether or not to output intermediate ordinal estimations
     # resize_conf - (optional) confidence to use for resizing (between 0-1) if None maintain original size
     # maintain_size- (optional) whether or not the results match the input image size
-    # full_only - flag to only use full size ordinal estimation (for ablation)
+    # inputs - string representing network inputs ('full', 'base', 'rgb', 'all) the rgb image is always included
     # device - string representing device to use for pipeline
     
     results = {}
@@ -55,7 +55,11 @@ def run_pipeline(models, img_arr, output_ordinal=False, resize_conf=None, base_s
         base_out = resize(base_out, (fh, fw, 1))
         full_out = full_out[:, :, np.newaxis]
         
-        ord_base, ord_full = equalize_predictions(lin_img, base_out, full_out, p=lstsq_p)
+        # if we are using all inputs, we scale the input estimations using the base estimate
+        if inputs == 'all':
+            ord_base, ord_full = equalize_predictions(lin_img, base_out, full_out, p=lstsq_p)
+        else:
+            ord_base, ord_full = base_out, full_out
         # ------------------------------------------------------
        
         # ordinal shading to real shading ----------------------
@@ -63,8 +67,12 @@ def run_pipeline(models, img_arr, output_ordinal=False, resize_conf=None, base_s
         bse = torch.from_numpy(ord_base).permute(2, 0, 1).to(device)
         fll = torch.from_numpy(ord_full).permute(2, 0, 1).to(device)
         
-        if full_only:
+        if inputs == 'full':
             combined = torch.cat((inp, fll), 0).unsqueeze(0)
+        elif inputs == 'base':
+            combined = torch.cat((inp, bse), 0).unsqueeze(0)
+        elif inputs == 'rgb':
+            combined = inp.unsqueeze(0)
         else:
             combined = torch.cat((inp, bse, fll), 0).unsqueeze(0)
 
