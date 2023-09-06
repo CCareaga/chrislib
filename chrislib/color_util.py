@@ -1,10 +1,12 @@
 import torch
 import numpy as np
 
-from .general import invert, uninvert
+from chrislib.general import invert, uninvert
 
+
+'''
+# this is defined in general.py
 def get_brightness(rgb, mode='numpy'):
-
     # "CCIR601 YIQ" method for computing brightness
     if mode == 'numpy':
         brightness = (0.3 * rgb[:,:,0]) + (0.59 * rgb[:,:,1]) + (0.11 * rgb[:,:,2])
@@ -12,8 +14,19 @@ def get_brightness(rgb, mode='numpy'):
     if mode == 'torch':
         brightness = (0.3 * rgb[0,:,:]) + (0.59 * rgb[1,:,:]) + (0.11 * rgb[2, :,:])
         return brightness.unsqueeze(0)
+'''
+
 
 def rgb2yuv(rgb, clip=True):
+    """TODO DESCRIPTION
+
+    params:
+        * rgb (TODO): TODO
+        * clip (bool): TODO (default True)
+
+    returns:
+        * yuv (TODO): TODO
+    """
     m = np.array([
         [0.299, -0.147,  0.615],
         [0.587, -0.289, -0.515],
@@ -27,7 +40,17 @@ def rgb2yuv(rgb, clip=True):
         
     return yuv.clip(0, 1)
 
+
 def yuv2rgb(yuv, clip=True):
+    """TODO DESCRIPTION
+
+    params:
+        * yuv (TODO): TODO
+        * clip (bool): TODO (default True)
+
+    returns:
+        * rgb (TODO): TODO
+    """
     m = np.array([
         [1.000,  1.000, 1.000],
         [0.000, -0.394, 2.032],
@@ -41,8 +64,17 @@ def yuv2rgb(yuv, clip=True):
         
     return rgb
 
-def rgb2luv(rgb, eps=0.001):
 
+def rgb2luv(rgb, eps=0.001):
+    """TODO DESCRIPTION
+
+    params:
+        * rgb (TODO): TODO
+        * eps (float): TODO (default 0.001)
+
+    returns:
+        * (TODO): TODO
+    """
     r = rgb[:, :, 0]
     g = rgb[:, :, 1]
     b = rgb[:, :, 2]
@@ -53,8 +85,17 @@ def rgb2luv(rgb, eps=0.001):
 
     return np.stack((l, u, v), axis=-1)
 
-def luv2rgb(luv, eps=0.001):
 
+def luv2rgb(luv, eps=0.001):
+    """TODO DESCRIPTION
+
+    params:
+        * luv (TODO): TODO
+        * eps (float): TODO (default 0.001)
+
+    returns:
+        * (TODO): TODO
+    """
     l = luv[:, :, 0]
     u = uninvert(luv[:, :, 1], eps=eps)
     v = uninvert(luv[:, :, 2], eps=eps)
@@ -65,7 +106,17 @@ def luv2rgb(luv, eps=0.001):
 
     return np.stack((r, g, b), axis=-1)
 
+
 def batch_rgb2luv(rgb, eps=0.001):
+    """TODO DESCRIPTION
+
+    params:
+        * rgb (TODO): TODO
+        * eps (float): TODO (default 0.001)
+
+    returns:
+        * (TODO): TODO
+    """
     r = rgb[:, 0, :, :]
     g = rgb[:, 1, :, :]
     b = rgb[:, 2, :, :]
@@ -76,7 +127,17 @@ def batch_rgb2luv(rgb, eps=0.001):
 
     return torch.stack((l, u, v), axis=1)
 
+
 def batch_luv2rgb(luv, eps=0.001):
+    """TODO DESCRIPTION
+
+    params:
+        * luv (TODO): TODO
+        * eps (float): TODO (default 0.001)
+
+    returns:
+        * (TODO): TODO
+    """
     l = luv[:, 0, :, :]
     u = uninvert(luv[:, 1, :, :], eps=eps)
     v = uninvert(luv[:, 2, :, :], eps=eps)
@@ -87,7 +148,17 @@ def batch_luv2rgb(luv, eps=0.001):
 
     return torch.stack((r, g, b), axis=1)
 
+
 def batch_rgb2iuv(rgb, eps=0.001):
+    """TODO DESCRIPTION
+
+    params:
+        * rgb (TODO): TODO
+        * eps (float): TODO (default 0.001)
+
+    returns:
+        * (TODO): TODO
+    """
     r = rgb[:, 0, :, :]
     g = rgb[:, 1, :, :]
     b = rgb[:, 2, :, :]
@@ -100,7 +171,17 @@ def batch_rgb2iuv(rgb, eps=0.001):
 
     return torch.stack((i, u, v), axis=1)
 
+
 def batch_iuv2rgb(iuv, eps=0.001):
+    """TODO DESCRIPTION
+
+    params:
+        * iuv (TODO): TODO
+        * eps (float): TODO (default 0.001)
+
+    returns:
+        * (TODO): TODO
+    """
     l = uninvert(iuv[:, 0, :, :], eps=eps)
     u = uninvert(iuv[:, 1, :, :], eps=eps)
     v = uninvert(iuv[:, 2, :, :], eps=eps)
@@ -309,9 +390,18 @@ DISTINCT_COLORS = np.array(
         "c0ff9b", "37c78a", "0094b4", "003f76", "788aec", "dbaaff", "650059",
         "7b0038", "140700", "a19140", "527d39", "5b9e82", "005162", "001f3b",
         "001cb6", "cb86ff", "ff9af2", "44001e",
-    ]], dtype=np.float
+    ]], dtype=float
 )
 DISTINCT_COLORS = DISTINCT_COLORS / 255.0
 
+
 def distinct_color(idx):
+    """Get the distinct color hex at index idx from the DISTINCT_COLORS array.
+
+    params:
+        * idx (int): the array index of the color to fetch
+
+    returns:
+        * (str): the hex for the color in DISTINCT_COLORS at index idx
+    """
     return DISTINCT_COLORS[idx]

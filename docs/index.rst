@@ -10,8 +10,9 @@ Welcome to chrislib's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   general
+   color_util
    data_util
+   general
 
 Indices and tables
 ==================
