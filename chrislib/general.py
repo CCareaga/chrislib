@@ -13,12 +13,11 @@ def pad_bb(bounding_box, amount=7):
     """Add padding to all elements of a PIL ImageDraw text bounding box.
 
     params:
-    * bounding_box (tuple): the bounding box to add padding to - must have four
-        integer elements: left, top, right, bottom
-    * amount (int) optional: the amount of padding to add (default 7)
+        * bounding_box (tuple): the bounding box to add padding to - must have four integer elements: left, top, right, bottom
+        * amount (int) optional: the amount of padding to add (default 7)
 
     returns:
-    * (tuple): bounding box tuple with padding added
+        * (tuple): bounding box tuple with padding added
     """
     return (
         bounding_box[0] - amount,
@@ -32,10 +31,10 @@ def add_chan(img):
     """Add a channel dimension to an image.
 
     params:
-    * img (numpy.array):
+        * img (numpy.array):
 
     returns:
-    * (numpy.array): the numpy image with an added channel dimension
+        * (numpy.array): the numpy image with an added channel dimension
     """
     return np.stack([img] * 3, -1)
 
@@ -44,16 +43,16 @@ def _tile_row(images, text, border, font, font_pos, font_color, text_box):
     """DESCRIPTION
 
     params:
-    * images (): 
-    * text (): 
-    * border (int): the size of border to add to each image
-    * font (): 
-    * font_pos (tuple): the (x,y) coordinates to anchor the text (2 integers)
-    * font_color (tuple): the RGB values for the desired color (3 integers)
-    * text_box ():
+        * images ():
+        * text ():
+        * border (int): the size of border to add to each image
+        * font ():
+        * font_pos (tuple): the (x,y) coordinates to anchor the text (2 integers)
+        * font_color (tuple): the RGB values for the desired color (3 integers)
+        * text_box ():
 
     returns:
-    * concat ():
+        * concat ():
     """
     assert(len(images) == len(text))
 
@@ -96,22 +95,22 @@ def tile_imgs(images, rescale=1.0, text=None, font_size=16, font_file="/usr/shar
     """DESCRIPTION
 
     params:
-    * images (): 
-    * rescale (float) optional: the desired amount to rescale the tiled images (default 1.0)
-    * text (array-like) optional: 
-    * font_size (int) optional: the desired size of the font (default 16)
-    * font_file (str) optional: a filename or path to a file containing a TrueType font
-    * font_color (tuple) optional: the RGB values for the desired color (3 integers) (default None)
-    * font_pos (tuple) optional: the (x,y) coordinates to anchor the text (2 integers) (default (0, 0))
-    * text_box () optional: 
-    * display (bool) optional: whether to display the tiled images
-    * save (str) optional: the filename or path to save the tiled images to. Use None to not save (default None)
-    * border (int) optional: the size of border to add to each image (default 20)
-    * cmap (str) optional: the colormap for matplotlib to use to map scalar data to colors (default "viridis")
-    * quality (int) optional: the image quality to save with. Minimum (worst) is 0, maximum (best) is 90 (default 75)
+        * images ():
+        * rescale (float) optional: the desired amount to rescale the tiled images (default 1.0)
+        * text (array-like) optional:
+        * font_size (int) optional: the desired size of the font (default 16)
+        * font_file (str) optional: a filename or path to a file containing a TrueType font
+        * font_color (tuple) optional: the RGB values for the desired color (3 integers) (default None)
+        * font_pos (tuple) optional: the (x,y) coordinates to anchor the text (2 integers) (default (0, 0))
+        * text_box () optional:
+        * display (bool) optional: whether to display the tiled images
+        * save (str) optional: the filename or path to save the tiled images to. Use None to not save (default None)
+        * border (int) optional: the size of border to add to each image (default 20)
+        * cmap (str) optional: the colormap for matplotlib to use to map scalar data to colors (default "viridis")
+        * quality (int) optional: the image quality to save with. Minimum (worst) is 0, maximum (best) is 90 (default 75)
 
     returns:
-    * tiled ():
+        * tiled ():
     """
     if not isinstance(images, list):
         print("expected list of images")
@@ -170,9 +169,9 @@ def show(img, size=(16, 9), save=None):
     """DESCRIPTION
 
     params:
-    * img ():
-    * size (tuple) optional: the integer width and height values (default (16,9))
-    * save (str) optional: the filename or path to save the tiled images to. Use None to not save (default None)
+        * img ():
+        * size (tuple) optional: the integer width and height values (default (16,9))
+        * save (str) optional: the filename or path to save the tiled images to. Use None to not save (default None)
     """
     if isinstance(img, list):
         img = tile_imgs(img, save=save)
@@ -186,15 +185,15 @@ def match_scale(pred, grnd, mask=None, skip_close=False, threshold=0.001, subsam
     """DESCRIPTION
 
     params:
-    * pred ():
-    * grnd ():
-    * mask () optional:
-    * skip_close (bool) optional:
-    * threshold (float) optional:
-    * subsample (float) optional:
+        * pred ():
+        * grnd ():
+        * mask () optional:
+        * skip_close (bool) optional:
+        * threshold (float) optional:
+        * subsample (float) optional:
 
     returns:
-    * ():
+        * ():
     """
     if mask is None:
         mask = np.ones(pred.shape[:2]).astype(bool)
@@ -218,13 +217,13 @@ def get_scale(a, b, mask=None, subsample=1.0):
     """DESCRIPTION
 
     params:
-    * a ():
-    * b ():
-    * mask () optional:
-    * subsample (float) optional:
+        * a ():
+        * b ():
+        * mask () optional:
+        * subsample (float) optional:
 
     returns:
-    * scale ():
+        * scale ():
     """
     if mask is None:
         mask = np.ones(pred.shape[:2])
@@ -248,11 +247,11 @@ def get_brightness(rgb, mode='numpy'):
     """DESCRIPTION
 
     params:
-    * rgb ():
-    * mode (str) optional:
+        * rgb ():
+        * mode (str) optional:
 
     returns:
-    * brightness ():
+        * brightness ():
     """
     # "CCIR601 YIQ" method for computing brightness
     if mode == 'numpy':
@@ -267,10 +266,10 @@ def minmax(img):
     """DESCRIPTION
 
     params:
-    * img ():
+        * img ():
 
     returns:
-    * img ():
+        * img ():
     """
     return (img - img.min()) / img.max()
 
@@ -279,10 +278,10 @@ def inv_2_real(inv_shd):
     """DESCRIPTION
 
     params:
-    * inv_shd ():
+        * inv_shd ():
 
     returns:
-    * shd ():
+        * shd ():
     """
     # first normalize the network inverse shading to be [0,1]
     norm_inv_shd = minmax(inv_shd)
@@ -297,10 +296,10 @@ def round_32(x):
     """Round a number up to the next multiple of 32.
 
     params:
-    * x (numeric): a number to round
+        * x (numeric): a number to round
 
     returns:
-    * (int): x rounded up to the next multiple of 32
+        * (int): x rounded up to the next multiple of 32
     """
     return 32 * math.ceil(x / 32)
 
@@ -310,10 +309,10 @@ def to2np(img):
     numpy image with dimensions (height, width, channel).
 
     params:
-    * img (torch.Tensor): a torch image with dimensions (c, h, w)
+        * img (torch.Tensor): a torch image with dimensions (c, h, w)
 
     returns:
-    * img (numpy.array): the image converted to numpy (h, w, c)
+        * img (numpy.array): the image converted to numpy (h, w, c)
     """
     return img.detach().cpu().permute(1, 2, 0).numpy()
 
@@ -322,11 +321,11 @@ def view_scale(img, p=100):
     """DESCRIPTION
 
     params:
-    * img ():
-    * p (int) optional:
+        * img ():
+        * p (int) optional:
 
     returns:
-    * img ():
+        * img ():
     """
     return (img / np.percentile(img, p)).clip(0, 1)
 
@@ -335,11 +334,11 @@ def view(img, p=100):
     """DESCRIPTION
 
     params:
-    * img ():
-    * p (int) optional:
+        * img ():
+        * p (int) optional:
 
     returns:
-    * img ():
+        * img ():
     """
     return view_scale(img ** (1/2.2), p=p)
 
@@ -348,10 +347,10 @@ def invert(x):
     """DESCRIPTION
 
     params:
-    * x ():
+        * x ():
 
     returns:
-    * out ():
+        * out ():
     """
     out = 1.0 / (x + 1.0)
     return out
@@ -361,12 +360,12 @@ def uninvert(x, eps=0.001, clip=True):
     """DESCRIPTION
 
     params:
-    * x ():
-    * eps (float) optional:
-    * clip (bool) optional:
+        * x ():
+        * eps (float) optional:
+        * clip (bool) optional:
 
     returns:
-    * out ():
+        * out ():
     """
     if clip:
         x = x.clip(eps, 1.0)
@@ -379,11 +378,11 @@ def get_tonemap_scale(rgb_color, p=90):
     """DESCRIPTION
 
     params:
-    * rgb_color ():
-    * p (int) optional:
+        * rgb_color ():
+        * p (int) optional:
 
     returns:
-    * scale ():
+        * scale ():
     """
     gamma                             = 1.0 / 2.2   # standard gamma correction exponent
     inv_gamma                         = 1.0 / gamma
