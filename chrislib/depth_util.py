@@ -1,40 +1,41 @@
 import sys
-import os
 
 # curr_path = '/home/chris/research/intrinsic/misc'
 curr_path = '/project/aksoy-lab/chris/misc'
 sys.path.append(curr_path)
 
 # OUR
-from BoostingMonocularDepth.utils import ImageandPatchs, ImageDataset, generatemask, getGF_fromintegral, calculateprocessingres, rgb2gray,\
-    applyGridpatch
+from BoostingMonocularDepth.utils import calculateprocessingres
 
 # MIDAS
-import BoostingMonocularDepth.midas.utils
 from BoostingMonocularDepth.midas.models.midas_net import MidasNet
 from BoostingMonocularDepth.midas.models.transforms import Resize, NormalizeImage, PrepareForNet
 
 # PIX2PIX : MERGE NET
-from BoostingMonocularDepth.pix2pix.options.test_options import TestOptions
 from BoostingMonocularDepth.pix2pix.models.pix2pix4depth_model import Pix2Pix4DepthModel
 
 import torch
 from torchvision.transforms import Compose
-from torchvision.transforms import transforms
 
-import time
-import os
 import cv2
 import numpy as np
-import argparse
 from argparse import Namespace
-import warnings
 
 whole_size_threshold = 3000  # R_max from the paper
 GPU_threshold = 1600 - 32 # Limit for the GPU (NVIDIA RTX 2080), can be adjusted 
 
+
 def create_depth_models(device='cuda', midas_path=None, pix2pix_path=None):
-    
+    """TODO DESCRIPTION
+
+    params:
+        * device (str) optional: TODO (default "cuda")
+        * midas_path (TODO) optional: TODO (default None)
+        * pix2pix_path (TODO) optional: TODO (default None)
+
+    returns:
+        * (list): TODO
+    """
     # opt = TestOptions().parse()
     opt = Namespace(Final=False, R0=False, R20=False, aspect_ratio=1.0, batch_size=1, checkpoints_dir=f'{curr_path}/BoostingMonocularDepth/pix2pix/checkpoints', colorize_results=False, crop_size=672, data_dir=None, dataroot=None, dataset_mode='depthmerge', depthNet=None, direction='AtoB', display_winsize=256, epoch='latest', eval=True, generatevideo=None, gpu_ids=[0], init_gain=0.02, init_type='normal', input_nc=2, isTrain=False, load_iter=0, load_size=672, max_dataset_size=10000, max_res=float('inf'), model='pix2pix4depth', n_layers_D=3, name='mergemodel', ndf=64, netD='basic', netG='unet_1024', net_receptive_field_size=None, ngf=64, no_dropout=False, no_flip=False, norm='none', num_test=50, num_threads=4, output_dir=None, output_nc=1, output_resolution=None, phase='test', pix2pixsize=None, preprocess='resize_and_crop', savecrops=None, savewholeest=None, serial_batches=False, suffix='', verbose=False)
     # opt = Namespace()
@@ -47,7 +48,7 @@ def create_depth_models(device='cuda', midas_path=None, pix2pix_path=None):
     if pix2pix_path == None:
         pix2pixmodel.save_dir = f'{curr_path}/BoostingMonocularDepth/pix2pix/checkpoints/mergemodel'
     else:
-        pix2pixmode.save_dir = pix2pix_path
+        pix2pixmodel.save_dir = pix2pix_path
 
     pix2pixmodel.load_networks('latest')
     pix2pixmodel.eval()
@@ -66,7 +67,16 @@ def create_depth_models(device='cuda', midas_path=None, pix2pix_path=None):
 
 
 def get_depth(img, models, threshold=0.2):
+    """TODO DESCRIPTION
 
+    params:
+        * img (TODO): TODO
+        * models (TODO): TODO
+        * threshold (float) optional: TODO (default 0.2)
+
+    returns:
+        * whole_estimate (TODO): TODO
+    """
     pix2pixmodel, midasmodel = models
 
     # Generate mask used to smoothly blend the local pathc estimations to the base estimate.
@@ -100,6 +110,19 @@ def get_depth(img, models, threshold=0.2):
 
 # Generate a double-input depth estimation
 def doubleestimate(img, size1, size2, pix2pixsize, pix2pixmodel, midasmodel):
+    """TODO DESCRIPTION
+
+    params:
+        * img (TODO): TODO
+        * size1 (TODO): TODO
+        * size2 (TODO): TODO
+        * pix2pixsize (TODO): TODO
+        * pix2pixmodel (TODO): TODO
+        * midasmodel (TODO): TODO
+
+    returns:
+        * prediction_mapped (TODO): TODO
+    """
     # Generate the low resolution estimation
     estimate1 = singleestimate(img, size1, midasmodel)
     # Resize to the inference size of merge network.
@@ -125,6 +148,16 @@ def doubleestimate(img, size1, size2, pix2pixsize, pix2pixmodel, midasmodel):
 
 # Generate a single-input depth estimation
 def singleestimate(img, msize, midasmodel):
+    """TODO DESCRIPTION
+
+    params:
+        * img (TODO): TODO
+        * msize (TODO): TODO
+        * midasmodel (TODO): TODO
+
+    returns:
+        * (TODO): TODO
+    """
     if msize > GPU_threshold:
         # print(" \t \t DEBUG| GPU THRESHOLD REACHED", msize, '--->', GPU_threshold)
         msize = GPU_threshold
@@ -137,8 +170,18 @@ def singleestimate(img, msize, midasmodel):
 
 
 def estimatemidas(img, midasmodel, msize, device='cuda'):
-    # MiDas -v2 forward pass script adapted from https://github.com/intel-isl/MiDaS/tree/v2
+    """TODO DESCRIPTION
 
+    params:
+        * img (TODO): TODO
+        * midasmodel (TODO): TODO
+        * msize (TODO): TODO
+        * device (str) optional: TODO (default "cuda")
+
+    returns:
+        * prediction (TODO): TODO
+    """
+    # MiDas -v2 forward pass script adapted from https://github.com/intel-isl/MiDaS/tree/v2
     transform = Compose(
         [
             Resize(
@@ -176,11 +219,15 @@ def estimatemidas(img, midasmodel, msize, device='cuda'):
 
     return prediction
 
+
 def write_depth(path, depth, bits=1 , colored=False):
     """Write depth map to pfm and png file.
-    Args:
-        path (str): filepath without extension
-        depth (array): depth
+
+    params:
+        * path (str): filepath without extension
+        * depth (array): depth
+        * bits (int) optional: TODO (default 1)
+        * colored (bool) optional: TODO (default False)
     """
     # write_pfm(path + ".pfm", depth.astype(np.float32))
     if colored == True:
