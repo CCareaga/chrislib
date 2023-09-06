@@ -15,6 +15,7 @@ Welcome to chrislib's documentation!
    gan_loss
    general
    loss
+   methods
 
 Indices and tables
 ==================

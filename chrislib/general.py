@@ -304,6 +304,18 @@ def round_32(x):
     return 32 * math.ceil(x / 32)
 
 
+def round_128(x):
+    """Round a number up to the next multiple of 128.
+
+    params:
+        * x (numeric): the number to round
+
+    returns:
+        * (int): x rounded up to the next multiple of 128
+    """
+    return 128 * math.ceil(x / 128)
+
+
 def to2np(img):
     """Convert a torch image with dimensions (channel, height, width) to a
     numpy image with dimensions (height, width, channel).
