@@ -16,6 +16,7 @@ Welcome to chrislib's documentation!
    general
    loss
    methods
+   metrics
 
 Indices and tables
 ==================
