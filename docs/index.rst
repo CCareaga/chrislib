@@ -12,6 +12,7 @@ Welcome to chrislib's documentation!
 
    color_util
    data_util
+   gan_loss
    general
 
 Indices and tables
