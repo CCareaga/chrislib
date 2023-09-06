@@ -22,7 +22,7 @@ def rgb2yuv(rgb, clip=True):
 
     params:
         * rgb (TODO): TODO
-        * clip (bool): TODO (default True)
+        * clip (bool) optional: TODO (default True)
 
     returns:
         * yuv (TODO): TODO
