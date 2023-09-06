@@ -3,7 +3,7 @@ Babel==2.12.1
 beautifulsoup4==4.12.2
 certifi==2023.7.22
 charset-normalizer==3.2.0
--e git+https://github.com/CCareaga/chrislib.git@3eb704659e436a2e29f245bb67eb099c49b04d27#egg=chrislib
+-e git+https://github.com/CCareaga/chrislib.git@9d02438cd544a472128c69738dd6e3f660f1fd2e#egg=chrislib
 contourpy==1.1.0
 cycler==0.11.0
 docutils==0.20.1
@@ -16,6 +16,7 @@ importlib-metadata==6.8.0
 importlib-resources==6.0.1
 Jinja2==3.1.2
 kiwisolver==1.4.5
+kornia==0.7.0
 lazy_loader==0.3
 MarkupSafe==2.1.3
 matplotlib==3.7.2

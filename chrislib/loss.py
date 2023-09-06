@@ -2,11 +2,20 @@ import kornia.filters as kn_filters
 import kornia.morphology as kn_morph
 import torchvision.transforms.functional as TF
 import torch
-import numpy as np
+
 
 def lp_loss(pred, grnd, mask, p=2):
-    # NOTE: assumes the mask is B x 1 x H x W
-                       
+    """TODO DESCRIPTION
+
+    params:
+        * pred (TODO): TODO
+        * grnd (TODO): TODO
+        * mask (TODO): TODO (must be B x 1 x H x W)
+        * p (int) optional: TODO (default 2)
+
+    returns:
+        * (TODO): TODO
+    """
     if p == 1:
         lp_term = torch.nn.functional.l1_loss(pred, grnd, reduction='none') * mask
     if p == 2:
@@ -14,8 +23,25 @@ def lp_loss(pred, grnd, mask, p=2):
                        
     return lp_term.sum() / (mask.sum() * lp_term.shape[1])
 
+
 class MSGLoss():
+    """TODO DESCRIPTION
+
+    params:
+        * scales (int) optional: TODO (default 4)
+        * taps (list) optional: TODO (default [1,1,1,1])
+        * k_size (list) optional: TODO (default [3,3,3,3])
+        * device (str) optional: TODO (default None)
+    """
     def __init__(self, scales=4, taps=[1, 1, 1, 1], k_size=[3, 3, 3, 3], device=None):
+        """Create an instance of MSGLoss.
+
+        params:
+            * scales (int) optional: TODO (default 4)
+            * taps (list) optional: TODO (default [1,1,1,1])
+            * k_size (list) optional: TODO (default [3,3,3,3])
+            * device (str) optional: TODO (default None)
+        """
         self.n_scale = scales
         self.taps = taps
         self.k_size = k_size
@@ -31,16 +57,43 @@ class MSGLoss():
         if self.device is not None:
             self.to_device(self.device)
 
+
     def to_device(self, device):
+        """TODO DESCRIPTION
+
+        params:
+            * device (str): TODO
+        """
         self.imgDerivative.to_device(device)
         self.device = device
         self.erod_kernels = [kernel.to(device) for kernel in self.erod_kernels]
 
+
     def __call__(self, output, target, mask=None):
+        """TODO DESCRIPTION
+
+        params:
+            * output (TODO): TODO
+            * target (TODO): TODO
+            * mask (TODO) optional: TODO (default None)
+
+        returns:
+            * (TODO): TODO
+        """
         return self.forward(output, target, mask)
 
-    def forward(self, output, target, mask):
 
+    def forward(self, output, target, mask):
+        """TODO DESCRIPTION
+
+        params:
+            * output (TODO): TODO
+            * target (TODO): TODO
+            * mask (TODO): TODO
+
+        returns:
+            * loss (TODO): TODO
+        """
         diff = output - target
 
         if mask is None:
@@ -71,18 +124,37 @@ class MSGLoss():
         return loss
 
     def resize_aa(self, img, scale):
-            if scale == 0:
-                return img
+        """TODO DESCRIPTION
 
-            # blurred = TF.gaussian_blur(img, self.k_size[scale])
-            # scaled = blurred[:, :, ::2**scale, ::2**scale]
-            # blurred = img
+        params:
+            * img (TODO): TODO
+            * scale (TODO): TODO
 
-            # NOTE: interpolate is noticeably faster than blur and sub-sample
-            scaled = torch.nn.functional.interpolate(img, scale_factor=1/(2**scale), mode='bilinear', align_corners=True, antialias=True)
-            return scaled
+        returns:
+            * (TODO): TODO
+        """
+        if scale == 0:
+            return img
+
+        # blurred = TF.gaussian_blur(img, self.k_size[scale])
+        # scaled = blurred[:, :, ::2**scale, ::2**scale]
+        # blurred = img
+
+        # NOTE: interpolate is noticeably faster than blur and sub-sample
+        scaled = torch.nn.functional.interpolate(img, scale_factor=1/(2**scale), mode='bilinear', align_corners=True, antialias=True)
+        return scaled
+
 
     def gradient_mag(self, diff, scale):
+        """TODO DESCRIPTION
+
+        params:
+            * diff (TODO): TODO
+            * scale (TODO): TODO
+
+        returns:
+            * grad_magnitude (TODO): TODO
+        """
         # B x C x H x W
         grad_x, grad_y = self.imgDerivative(diff, self.taps[scale])
 
@@ -91,9 +163,19 @@ class MSGLoss():
 
         return grad_magnitude
 
-class ImageDerivative():
-    def __init__(self, device=None):
 
+class ImageDerivative():
+    """TODO DESCRIPTION
+
+    params:
+        * device (str) optional: TODO (default None)
+    """
+    def __init__(self, device=None):
+        """Creates an instance of ImageDerivative
+
+        params:
+            * device (str) optional: TODO (default None)
+        """
         # seperable kernel: first derivative, second prefiltering
         tap_3 = torch.tensor([[0.425287, -0.0000, -0.425287], [0.229879, 0.540242, 0.229879]])
         tap_5 = torch.tensor([[0.109604,  0.276691,  0.000000, -0.276691, -0.109604], [0.037659,  0.249153,  0.426375,  0.249153,  0.037659]])
@@ -109,20 +191,42 @@ class ImageDerivative():
         if device is not None:
             self.to_device(device)
 
-    def to_device(self,device):
+
+    def to_device(self, device):
+        """TODO DESCRIPTION
+
+        params:
+            * device (str): TODO
+        """
         self.kernels = [kernel.to(device) for kernel in self.kernels]
 
-    def __call__(self, img, t_id):
-        #
-        # img : B x C x H x W
-        # t_id : tap radius [for example t_id=1 will use the tap 3]
 
+    def __call__(self, img, t_id):
+        """TODO DESCRIPTION
+
+        params:
+            * img (TODO): image with dimensions B x C x H x W
+            * t_id (int): tap radius (for example t_id=1 will use the tap 3)
+
+        returns:
+            * (TODO): TODO
+        """
         if t_id == 3 or t_id == 5:
             assert False, "Not Implemented"
 
         return self.forward(img, t_id)
 
+
     def forward(self, img, t_id=1):
+        """TODO DESCRIPTION
+
+        params:
+            * img (TODO): image with dimensions B x C x H x W
+            * t_id (int) optional: tap radius (for example t_id=1 will use the tap 3) (default 1)
+
+        returns:
+            * (tuple): TODO
+        """
         kernel = self.kernels[t_id-1]
 
         p = kernel[1 : 2, ...]
@@ -133,4 +237,3 @@ class ImageDerivative():
         grad_y = kn_filters.filter2d_separable(img, d1, p, border_type='reflect', normalized=False, padding='same')
 
         return (grad_x, grad_y)
-

@@ -14,6 +14,7 @@ Welcome to chrislib's documentation!
    data_util
    gan_loss
    general
+   loss
 
 Indices and tables
 ==================
