@@ -11,7 +11,7 @@ Welcome to chrislib's documentation!
    :caption: Contents:
 
    general
-
+   data_util
 
 Indices and tables
 ==================
