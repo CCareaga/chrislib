@@ -1,36 +1,60 @@
-import os
-import sys
 import numpy as np
 import math
-import skimage
-import cv2
 import scipy as sp
-import scipy.ndimage
-import torch
-
 
 import matplotlib.pyplot as plt
 from PIL import Image, ImageDraw, ImageFont
 from skimage.transform import resize
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(dir_path)
+from chrislib.data_util import np_to_pil
 
-from data_util import np_to_pil
 
-def pad_bb(bb, amount=7):
+def pad_bb(bounding_box, amount=7):
+    """Add padding to all elements of a PIL ImageDraw text bounding box.
+
+    params:
+    * bounding_box (tuple): the bounding box to add padding to - must have four
+        integer elements: left, top, right, bottom
+    * amount (int) optional: the amount of padding to add (default 7)
+
+    returns:
+    * (tuple): bounding box tuple with padding added
+    """
     return (
-        bb[0] - 7,
-        bb[1] - 7,
-        bb[2] + 7,
-        bb[3] + 7
+        bounding_box[0] - amount,
+        bounding_box[1] - amount,
+        bounding_box[2] + amount,
+        bounding_box[3] + amount
     )
 
+
 def add_chan(img):
+    """Add a channel dimension to an image.
+
+    params:
+    * img (numpy.array):
+
+    returns:
+    * (numpy.array): the numpy image with an added channel dimension
+    """
     return np.stack([img] * 3, -1)
 
-def _tile_row(images, text, border, font, font_pos, font_color, text_box):
 
+def _tile_row(images, text, border, font, font_pos, font_color, text_box):
+    """DESCRIPTION
+
+    params:
+    * images (): 
+    * text (): 
+    * border (int): the size of border to add to each image
+    * font (): 
+    * font_pos (tuple): the (x,y) coordinates to anchor the text (2 integers)
+    * font_color (tuple): the RGB values for the desired color (3 integers)
+    * text_box ():
+
+    returns:
+    * concat ():
+    """
     assert(len(images) == len(text))
 
     border_pix = np.ones((images[0].shape[0], border, 3))
@@ -38,7 +62,7 @@ def _tile_row(images, text, border, font, font_pos, font_color, text_box):
 
     for im, txt in zip(images, text):
         if len(im.shape) == 2:
-            im = np.stack([im] * 3, -1)
+            im = add_chan(im)
 
         if im.shape[-1] == 1:
             im = np.concatenate([im] * 3, -1)
@@ -66,9 +90,29 @@ def _tile_row(images, text, border, font, font_pos, font_color, text_box):
     concat = np.concatenate(elements, axis=1)
     return concat
 
+
 def tile_imgs(images, rescale=1.0, text=None, font_size=16, font_file="/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
               font_color=None, font_pos=(0, 0), text_box=None, display=False, save=None, border=20, cmap='viridis', quality=75):
-    
+    """DESCRIPTION
+
+    params:
+    * images (): 
+    * rescale (float) optional: the desired amount to rescale the tiled images (default 1.0)
+    * text (array-like) optional: 
+    * font_size (int) optional: the desired size of the font (default 16)
+    * font_file (str) optional: a filename or path to a file containing a TrueType font
+    * font_color (tuple) optional: the RGB values for the desired color (3 integers) (default None)
+    * font_pos (tuple) optional: the (x,y) coordinates to anchor the text (2 integers) (default (0, 0))
+    * text_box () optional: 
+    * display (bool) optional: whether to display the tiled images
+    * save (str) optional: the filename or path to save the tiled images to. Use None to not save (default None)
+    * border (int) optional: the size of border to add to each image (default 20)
+    * cmap (str) optional: the colormap for matplotlib to use to map scalar data to colors (default "viridis")
+    * quality (int) optional: the image quality to save with. Minimum (worst) is 0, maximum (best) is 90 (default 75)
+
+    returns:
+    * tiled ():
+    """
     if not isinstance(images, list):
         print("expected list of images")
         return
@@ -121,7 +165,15 @@ def tile_imgs(images, rescale=1.0, text=None, font_size=16, font_file="/usr/shar
 
     return tiled
 
+
 def show(img, size=(16, 9), save=None):
+    """DESCRIPTION
+
+    params:
+    * img ():
+    * size (tuple) optional: the integer width and height values (default (16,9))
+    * save (str) optional: the filename or path to save the tiled images to. Use None to not save (default None)
+    """
     if isinstance(img, list):
         img = tile_imgs(img, save=save)
 
@@ -129,7 +181,21 @@ def show(img, size=(16, 9), save=None):
     plt.imshow(img)
     plt.axis('off')
 
+
 def match_scale(pred, grnd, mask=None, skip_close=False, threshold=0.001, subsample=1.0):
+    """DESCRIPTION
+
+    params:
+    * pred ():
+    * grnd ():
+    * mask () optional:
+    * skip_close (bool) optional:
+    * threshold (float) optional:
+    * subsample (float) optional:
+
+    returns:
+    * ():
+    """
     if mask is None:
         mask = np.ones(pred.shape[:2]).astype(bool)
 
@@ -147,7 +213,19 @@ def match_scale(pred, grnd, mask=None, skip_close=False, threshold=0.001, subsam
 
     return scale * pred
 
+
 def get_scale(a, b, mask=None, subsample=1.0):
+    """DESCRIPTION
+
+    params:
+    * a ():
+    * b ():
+    * mask () optional:
+    * subsample (float) optional:
+
+    returns:
+    * scale ():
+    """
     if mask is None:
         mask = np.ones(pred.shape[:2])
 
@@ -167,7 +245,15 @@ def get_scale(a, b, mask=None, subsample=1.0):
 
 
 def get_brightness(rgb, mode='numpy'):
+    """DESCRIPTION
 
+    params:
+    * rgb ():
+    * mode (str) optional:
+
+    returns:
+    * brightness ():
+    """
     # "CCIR601 YIQ" method for computing brightness
     if mode == 'numpy':
         brightness = (0.3 * rgb[:,:,0]) + (0.59 * rgb[:,:,1]) + (0.11 * rgb[:,:,2])
@@ -176,10 +262,28 @@ def get_brightness(rgb, mode='numpy'):
         brightness = (0.3 * rgb[0,:,:]) + (0.59 * rgb[1,:,:]) + (0.11 * rgb[2, :,:])
         return brightness.unsqueeze(0)
 
+
 def minmax(img):
+    """DESCRIPTION
+
+    params:
+    * img ():
+
+    returns:
+    * img ():
+    """
     return (img - img.min()) / img.max()
 
+
 def inv_2_real(inv_shd):
+    """DESCRIPTION
+
+    params:
+    * inv_shd ():
+
+    returns:
+    * shd ():
+    """
     # first normalize the network inverse shading to be [0,1]
     norm_inv_shd = minmax(inv_shd)
 
@@ -188,26 +292,82 @@ def inv_2_real(inv_shd):
 
     return shd.clip(1e-5)
 
+
 def round_32(x):
+    """Round a number up to the next multiple of 32.
+
+    params:
+    * x (numeric): a number to round
+
+    returns:
+    * (int): x rounded up to the next multiple of 32
+    """
     return 32 * math.ceil(x / 32)
 
+
 def to2np(img):
+    """Convert a torch image with dimensions (channel, height, width) to a
+    numpy image with dimensions (height, width, channel).
+
+    params:
+    * img (torch.Tensor): a torch image with dimensions (c, h, w)
+
+    returns:
+    * img (numpy.array): the image converted to numpy (h, w, c)
+    """
     return img.detach().cpu().permute(1, 2, 0).numpy()
+
 
 def view_scale(img, p=100):
+    """DESCRIPTION
+
+    params:
+    * img ():
+    * p (int) optional:
+
+    returns:
+    * img ():
+    """
     return (img / np.percentile(img, p)).clip(0, 1)
 
+
 def view(img, p=100):
+    """DESCRIPTION
+
+    params:
+    * img ():
+    * p (int) optional:
+
+    returns:
+    * img ():
+    """
     return view_scale(img ** (1/2.2), p=p)
 
-def to2np(img):
-    return img.detach().cpu().permute(1, 2, 0).numpy()
 
 def invert(x):
+    """DESCRIPTION
+
+    params:
+    * x ():
+
+    returns:
+    * out ():
+    """
     out = 1.0 / (x + 1.0)
     return out
 
+
 def uninvert(x, eps=0.001, clip=True):
+    """DESCRIPTION
+
+    params:
+    * x ():
+    * eps (float) optional:
+    * clip (bool) optional:
+
+    returns:
+    * out ():
+    """
     if clip:
         x = x.clip(eps, 1.0)
 
@@ -216,6 +376,15 @@ def uninvert(x, eps=0.001, clip=True):
 
 
 def get_tonemap_scale(rgb_color, p=90):
+    """DESCRIPTION
+
+    params:
+    * rgb_color ():
+    * p (int) optional:
+
+    returns:
+    * scale ():
+    """
     gamma                             = 1.0 / 2.2   # standard gamma correction exponent
     inv_gamma                         = 1.0 / gamma
     # percentile                        = 90        # we want this percentile brightness value in the unmodified image...
@@ -238,174 +407,3 @@ def get_tonemap_scale(rgb_color, p=90):
         scale = np.power(brightness_nth_percentile_desired, inv_gamma) / brightness_nth_percentile_current
 
     return scale
-
-# GUIDED FILTER
-def box(img, r):
-    """ O(1) box filter
-        img - >= 2d image
-        r   - radius of box filter
-    """
-    (rows, cols) = img.shape[:2]
-    imDst = np.zeros_like(img)
-
-
-    tile = [1] * img.ndim
-    tile[0] = r
-    imCum = np.cumsum(img, 0)
-    imDst[0:r+1, :, ...] = imCum[r:2*r+1, :, ...]
-    imDst[r+1:rows-r, :, ...] = imCum[2*r+1:rows, :, ...] - imCum[0:rows-2*r-1, :, ...]
-    imDst[rows-r:rows, :, ...] = np.tile(imCum[rows-1:rows, :, ...], tile) - imCum[rows-2*r-1:rows-r-1, :, ...]
-
-    tile = [1] * img.ndim
-    tile[1] = r
-    imCum = np.cumsum(imDst, 1)
-    imDst[:, 0:r+1, ...] = imCum[:, r:2*r+1, ...]
-    imDst[:, r+1:cols-r, ...] = imCum[:, 2*r+1 : cols, ...] - imCum[:, 0 : cols-2*r-1, ...]
-    imDst[:, cols-r: cols, ...] = np.tile(imCum[:, cols-1:cols, ...], tile) - imCum[:, cols-2*r-1 : cols-r-1, ...]
-
-    return imDst
-
-def _gf_color(I, p, r, eps, s=None):
-    """ Color guided filter
-    I - guide image (rgb)
-    p - filtering input (single channel)
-    r - window radius
-    eps - regularization (roughly, variance of non-edge noise)
-    s - subsampling factor for fast guided filter
-    """
-    fullI = I
-    fullP = p
-    if s is not None:
-        I = sp.ndimage.zoom(fullI, [1/s, 1/s, 1], order=1)
-        p = sp.ndimage.zoom(fullP, [1/s, 1/s], order=1)
-        r = round(r / s)
-
-    h, w = p.shape[:2]
-    N = box(np.ones((h, w)), r)
-
-    mI_r = box(I[:,:,0], r) / N
-    mI_g = box(I[:,:,1], r) / N
-    mI_b = box(I[:,:,2], r) / N
-
-    mP = box(p, r) / N
-
-    # mean of I * p
-    mIp_r = box(I[:,:,0]*p, r) / N
-    mIp_g = box(I[:,:,1]*p, r) / N
-    mIp_b = box(I[:,:,2]*p, r) / N
-
-    # per-patch covariance of (I, p)
-    covIp_r = mIp_r - mI_r * mP
-    covIp_g = mIp_g - mI_g * mP
-    covIp_b = mIp_b - mI_b * mP
-
-    # symmetric covariance matrix of I in each patch:
-    #       rr rg rb
-    #       rg gg gb
-    #       rb gb bb
-    var_I_rr = box(I[:,:,0] * I[:,:,0], r) / N - mI_r * mI_r;
-    var_I_rg = box(I[:,:,0] * I[:,:,1], r) / N - mI_r * mI_g;
-    var_I_rb = box(I[:,:,0] * I[:,:,2], r) / N - mI_r * mI_b;
-
-    var_I_gg = box(I[:,:,1] * I[:,:,1], r) / N - mI_g * mI_g;
-    var_I_gb = box(I[:,:,1] * I[:,:,2], r) / N - mI_g * mI_b;
-
-    var_I_bb = box(I[:,:,2] * I[:,:,2], r) / N - mI_b * mI_b;
-
-    a = np.zeros((h, w, 3))
-    for i in range(h):
-        for j in range(w):
-            sig = np.array([
-                [var_I_rr[i,j], var_I_rg[i,j], var_I_rb[i,j]],
-                [var_I_rg[i,j], var_I_gg[i,j], var_I_gb[i,j]],
-                [var_I_rb[i,j], var_I_gb[i,j], var_I_bb[i,j]]
-            ])
-            covIp = np.array([covIp_r[i,j], covIp_g[i,j], covIp_b[i,j]])
-            a[i,j,:] = np.linalg.solve(sig + eps * np.eye(3), covIp)
-
-    b = mP - a[:,:,0] * mI_r - a[:,:,1] * mI_g - a[:,:,2] * mI_b
-
-    meanA = box(a, r) / N[...,np.newaxis]
-    meanB = box(b, r) / N
-
-    if s is not None:
-        meanA = sp.ndimage.zoom(meanA, [s, s, 1], order=1)
-        meanB = sp.ndimage.zoom(meanB, [s, s], order=1)
-
-    q = np.sum(meanA * fullI, axis=2) + meanB
-
-    return q
-
-
-def _gf_gray(I, p, r, eps, s=None):
-    """ grayscale (fast) guided filter
-        I - guide image (1 channel)
-        p - filter input (1 channel)
-        r - window raidus
-        eps - regularization (roughly, allowable variance of non-edge noise)
-        s - subsampling factor for fast guided filter
-    """
-    if s is not None:
-        Isub = sp.ndimage.zoom(I, 1/s, order=1)
-        Psub = sp.ndimage.zoom(p, 1/s, order=1)
-        r = round(r / s)
-    else:
-        Isub = I
-        Psub = p
-
-
-    (rows, cols) = Isub.shape
-
-    N = box(np.ones([rows, cols]), r)
-
-    meanI = box(Isub, r) / N
-    meanP = box(Psub, r) / N
-    corrI = box(Isub * Isub, r) / N
-    corrIp = box(Isub * Psub, r) / N
-    varI = corrI - meanI * meanI
-    covIp = corrIp - meanI * meanP
-
-
-    a = covIp / (varI + eps)
-    b = meanP - a * meanI
-
-    meanA = box(a, r) / N
-    meanB = box(b, r) / N
-
-    if s is not None:
-        meanA = sp.ndimage.zoom(meanA, s, order=1)
-        meanB = sp.ndimage.zoom(meanB, s, order=1)
-
-    q = meanA * I + meanB
-    return q
-
-
-def _gf_colorgray(I, p, r, eps, s=None):
-    """ automatically choose color or gray guided filter based on I's shape """
-    if I.ndim == 2 or I.shape[2] == 1:
-        return _gf_gray(I, p, r, eps, s)
-    elif I.ndim == 3 and I.shape[2] == 3:
-        return _gf_color(I, p, r, eps, s)
-    else:
-        print("Invalid guide dimensions:", I.shape)
-
-
-def guided_filter(I, p, r, eps, s=None):
-    """ run a guided filter per-channel on filtering input p
-        I - guide image (1 or 3 channel)
-        p - filter input (n channel)
-        r - window raidus
-        eps - regularization (roughly, allowable variance of non-edge noise)
-        s - subsampling factor for fast guided filter
-    """
-    if p.ndim == 2:
-        p3 = p[:,:,np.newaxis]
-    else:
-        p3 = p
-
-    out = np.zeros_like(p3)
-    for ch in range(p3.shape[2]):
-        out[:,:,ch] = _gf_colorgray(I, p3[:,:,ch], r, eps, s)
-
-    return np.squeeze(out) if p.ndim == 2 else out
-
