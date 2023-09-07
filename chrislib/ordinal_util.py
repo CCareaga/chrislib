@@ -1,15 +1,20 @@
-import os
-import sys
 import torch
 import numpy as np
 from skimage.transform import resize
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(dir_path)
-
 from general import round_32, minmax, get_brightness
 
+
 def base_resize(img, base_size=384):
+    """TODO DESCRIPTION
+
+    params:
+        * img (TODO): TODO
+        * base_size (int) optional: TODO (default 384)
+
+    returns:
+        * net_input (TODO): TODO
+    """
     h, w, _ = img.shape
 
     max_dim = max(h, w)
@@ -21,14 +26,36 @@ def base_resize(img, base_size=384):
     net_input = resize(img, (new_h, new_w, 3), anti_aliasing=True)
     return net_input
 
+
 def full_resize(img):
+    """TODO DESCRIPTION
+
+    params:
+        * img (TODO): TODO
+
+    returns:
+        * net_input (TODO): TODO
+    """
     h, w, _ = img.shape
     new_h, new_w = round_32(h), round_32(w)
 
     net_input = resize(img, (new_h, new_w, 3), anti_aliasing=True)
     return net_input
 
-def equalize_predictions(img, base, full, use_full=False, p=0.5):
+
+def equalize_predictions(img, base, full, p=0.5):
+    """TODO DESCRIPTION
+
+    params:
+        * img (TODO): TODO
+        * base (TODO): TODO
+        * full (TODO): TODO
+        * p (int) optional: TODO (default 0.5)
+
+    returns:
+        * base (TODO): TODO
+        * new_full (TODO): TODO
+    """
     h, w, _ = img.shape
 
     full_shd = (1. / full.clip(1e-5)) - 1.
@@ -50,7 +77,19 @@ def equalize_predictions(img, base, full, use_full=False, p=0.5):
 
     return base, new_full
 
+
 def ordinal_forward(model, img, normalize=False, dev='cuda'):
+    """TODO DESCRIPTION
+
+    params:
+        * model (TODO): TODO
+        * img (TODO): TODO
+        * normalize (bool) optional: TODO (default False)
+        * dev (str) optional: the device to run the model on (default "cuda")
+
+    returns:
+        * (TODO): TODO
+    """
     fh, fw, _ = img.shape
     
     base_input = base_resize(img)

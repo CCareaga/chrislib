@@ -20,6 +20,7 @@ Welcome to chrislib's documentation!
    midas_loss
    model_util
    normal_util
+   ordinal_util
 
 Indices and tables
 ==================
