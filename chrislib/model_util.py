@@ -1,20 +1,23 @@
-import sys
-from os.path import dirname, abspath
 import torch
-from pathlib import Path
-
-parent_path = dirname(abspath(__file__))
-sys.path.append(parent_path)
-
 from altered_midas.midas_net import MidasNet
 from altered_midas.midas_net_custom import MidasNet_small
+
 
 def load_models(
     ord_path='/home/chris/research/intrinsic/boosted_shading/results/final_weights/vivid_bird_318_300.pt',
     mrg_path='/home/chris/research/intrinsic/boosted_shading/results/final_weights/fluent_eon_138_200.pt',
     device='cuda'
 ):
+    """TODO DESCRIPTION
 
+    params:
+        * ord_path (str) optional: TODO (default path to vivid_bird_318_300.pt)
+        * mrg_path (str) optional: TODO (default path to fluent_eon_138_200.pt)
+        * device (str) optional: the device to run the model on (default "cuda")
+
+    returns:
+        * models (TODO): TODO
+    """
     models = {}
 
     ord_model = MidasNet()
@@ -31,4 +34,3 @@ def load_models(
     models['real_model'] = mrg_model
     
     return models
-
