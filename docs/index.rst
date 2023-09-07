@@ -21,6 +21,7 @@ Welcome to chrislib's documentation!
    model_util
    normal_util
    ordinal_util
+   pipeline
 
 Indices and tables
 ==================

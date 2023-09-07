@@ -8,14 +8,23 @@ from .general import round_32
 
 
 def run_pipeline(models, img_arr, output_ordinal=False, resize_conf=None, base_size=384, maintain_size=False, linear=False, device='cuda', lstsq_p=0.0, inputs='all'):
-    # models - models dictionary returned by load_models()
-    # img_arr - RGB input image as numpy array between 0-1
-    # output_ordinal - whether or not to output intermediate ordinal estimations
-    # resize_conf - (optional) confidence to use for resizing (between 0-1) if None maintain original size
-    # maintain_size- (optional) whether or not the results match the input image size
-    # inputs - string representing network inputs ('full', 'base', 'rgb', 'all) the rgb image is always included
-    # device - string representing device to use for pipeline
-    
+    """TODO DESCRIPTION
+
+    params:
+        * models (dict): models dictionary returned by load_models()
+        * img_arr (np.array): RGB input image as numpy array between 0-1
+        * output_ordinal (bool) optional: whether or not to output intermediate ordinal estimations (default False)
+        * resize_conf (float) optional: confidence to use for resizing (between 0-1) if None maintain original size (default None)
+        * base_size (int) optional: TODO (default 384)
+        * maintain_size (bool) optional: whether or not the results match the input image size (default False)
+        * linear (bool) optional: TODO (default False)
+        * device (str) optional: string representing device to use for pipeline (default "cuda")
+        * lstsq_p (float) optional: TODO (default 0.0)
+        * inputs (str) optional: network inputs ("full", "base", "rgb", "all") the rgb image is always included (default "all")
+
+    returns:
+        * results (TODO): TODO
+    """    
     results = {}
     
     orig_h, orig_w, _ = img_arr.shape
