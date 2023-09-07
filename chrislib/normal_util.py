@@ -1,18 +1,20 @@
-import os
 import sys
 import torch
 import numpy as np
 import cv2
-
 from skimage.transform import resize
-
-dir_path = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(dir_path)
-
 from general import round_32
 
-def load_omni_model(omni_dir):
 
+def load_omni_model(omni_dir):
+    """TODO DESCRIPTION
+
+    params:
+        * omni_dir (str): TODO
+
+    returns:
+        * model (TODO): TODO
+    """
     sys.path.append(omni_dir)
 
     omni_model_dir = f'{omni_dir}/omnidata_tools/torch/pretrained_models/'
@@ -38,8 +40,18 @@ def load_omni_model(omni_dir):
     
     return model
 
+
 def get_omni_normals(model, img, zero_one=True):
-    
+    """TODO DESCRIPTION
+
+    params:
+        * model (TODO): TODO
+        * img (TODO): TODO
+        * zero_one (bool) optional: TODO (default True)
+
+    returns:
+        * np_out (TODO): TODO
+    """
     h, w, _ = img.shape
 
     img = resize(img, (round_32(h), round_32(w)), anti_aliasing=True)
@@ -62,7 +74,16 @@ def get_omni_normals(model, img, zero_one=True):
     
     return np_out
 
+
 def prediction_to_normal(pred):
+    """TODO DESCRIPTION
+
+    params:
+        * pred (TODO): TODO
+
+    returns:
+        * (TODO): TODO
+    """
     # x, y = pred[:, 0, :, :], pred[:, 1, :, :]
     # z = torch.sqrt((1.0 - (x**2 + y**2)).clip(1e-4))
 
@@ -78,7 +99,18 @@ def prediction_to_normal(pred):
     norm = torch.linalg.norm(pred, dim=1, keepdim=True).clip(1e-4)
     return pred / norm
 
+
 def angular_error(gt, pred, mask):
+    """TODO DESCRIPTION
+
+    params:
+        * gt (TODO): TODO
+        * pred (TODO): TODO
+        * mask (TODO): TODO
+
+    returns:
+        * (TODO): TODO
+    """
     gt = gt.astype(np.float64) 
     pred = pred.astype(np.float64) 
 
@@ -96,9 +128,21 @@ def angular_error(gt, pred, mask):
 
     return ang_err[mask]
 
-def compute_metrics(ang_err):
-    # six surface normal metrics following: https://web.eecs.umich.edu/~fouhey/2016/evalSN/evalSN.html
 
+def compute_metrics(ang_err):
+    """Six surface normal metrics following: https://web.eecs.umich.edu/~fouhey/2016/evalSN/evalSN.html
+
+    params:
+        * ang_err (TODO): TODO
+
+    returns:
+        * mean_err (TODO): TODO
+        * med_err (TODO): TODO
+        * rmse (TODO): TODO
+        * t1 (TODO): TODO
+        * t2 (TODO): TODO
+        * t3 (TODO): TODO
+    """
     mean_err = np.mean(ang_err)
     med_err = np.median(ang_err)
     rmse = np.sqrt(np.mean(np.power(ang_err, 2.0)))
@@ -108,12 +152,19 @@ def compute_metrics(ang_err):
     t3 = np.mean(ang_err < 30.0)
 
     return mean_err, med_err, rmse, t1, t2, t3
-   
-def depth_to_normals(depth, k=7, perc=90):
-    # depth: input depth as np.array
-    # k: sobel kernel size for depth gradient computation
-    # perc: percentile used to clip outliers in gradient magnitude
 
+
+def depth_to_normals(depth, k=7, perc=90):
+    """TODO DESCRIPTION
+
+    params:
+        * depth (np.array): input depth
+        * k (int) optional: sobel kernel size for depth gradient computation (default 7)
+        * perc (int): percentile used to clip outliers in gradient magnitude (default 90)
+
+    returns:
+        * normal (TODO): TODO
+    """
     h, w = depth.shape
     
     # compute x and y gradients with sobel

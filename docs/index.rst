@@ -19,6 +19,7 @@ Welcome to chrislib's documentation!
    metrics
    midas_loss
    model_util
+   normal_util
 
 Indices and tables
 ==================
