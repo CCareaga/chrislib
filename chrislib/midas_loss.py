@@ -4,7 +4,6 @@ source: https://gist.github.com/ranftlr/1d6194db2e1dffa0a50c9b0a9549cbd2
 # Script for finetuning losses
 
 import torch
-import ipdb
 
 EPSILON = 1e-6
 _dtype = torch.float32
@@ -13,9 +12,15 @@ _dtype = torch.float32
 
 
 def reduction_batch_based(image_loss, M):
-    # average of all valid pixels of the batch
+    """Average of all valid pixels of the batch. Avoid division by 0 (if sum(M) = sum(sum(mask)) = 0: sum(image_loss) = 0)
 
-    # avoid division by 0 (if sum(M) = sum(sum(mask)) = 0: sum(image_loss) = 0)
+    params:
+        * image_loss (TODO): TODO
+        * M (TODO): TODO
+
+    returns:
+        * (float): TODO
+    """
     divisor = torch.sum(M)
 
     if divisor == 0:
@@ -25,9 +30,15 @@ def reduction_batch_based(image_loss, M):
 
 
 def reduction_image_based(image_loss, M):
-    # mean of valid pixels of an image
+    """Average of all valid pixels of an image. Avoid division by 0 (if sum(M) = sum(sum(mask)) = 0: sum(image_loss) = 0)
 
-    # avoid division by 0 (if M = sum(mask) = 0: image_loss = 0)
+    params:
+        * image_loss (TODO): TODO
+        * M (TODO): TODO
+
+    returns:
+        * (float): TODO
+    """
     valid = M.nonzero()
 
     image_loss[valid] = image_loss[valid] / M[valid]
@@ -36,6 +47,17 @@ def reduction_image_based(image_loss, M):
 
 
 def compute_scale_and_shift(prediction, target, mask):
+    """TODO DESCRIPTION
+
+    params:
+        * prediction (TODO): TODO
+        * target (TODO): TODO
+        * mask (TODO): TODO
+
+    returns:
+        * x_0 (TODO): TODO
+        * x_1 (TODO): TODO
+    """
     # system matrix: A = [[a_00, a_01], [a_10, a_11]]
     a_00 = torch.sum(mask * prediction * prediction, (1, 2))
     a_01 = torch.sum(mask * prediction, (1, 2))
@@ -62,7 +84,17 @@ def compute_scale_and_shift(prediction, target, mask):
 
 
 def midas_mse_loss(pred_depth, gt_depth, mask, reduction):
+    """TODO DESCRIPTION
 
+    params:
+        * pred_depth (TODO): TODO
+        * gt_depth (TODO): TODO
+        * mask (TODO): TODO
+        * reduction (TODO): TODO
+
+    returns:
+        * (TODO): TODO
+    """
     M = torch.sum(mask, (1, 2))
     res = pred_depth - gt_depth
     image_loss = torch.sum(mask * res * res, (1, 2))
@@ -71,7 +103,17 @@ def midas_mse_loss(pred_depth, gt_depth, mask, reduction):
 
 
 def midas_gradient_loss(prediction, target, mask, reduction):
+    """TODO DESCRIPTION
 
+    params:
+        * prediction (TODO): TODO
+        * target (TODO): TODO
+        * mask (TODO): TODO
+        * reduction (TODO): TODO
+
+    returns:
+        * (TODO): TODO
+    """
     M = torch.sum(mask, (1, 2))
 
     diff = prediction - target
@@ -91,6 +133,15 @@ def midas_gradient_loss(prediction, target, mask, reduction):
 
 
 def normalize_prediction_robust(target, mask):
+    """TODO DESCRIPTION
+
+    params:
+        * target (TODO): TODO
+        * mask (TODO): TODO
+
+    returns:
+        * (TODO): TODO
+    """
     ssum = torch.sum(mask, (1, 2))
     valid = ssum > 0
 
@@ -111,6 +162,18 @@ def normalize_prediction_robust(target, mask):
 
 
 def trimmed_mae_loss(prediction, target, mask, reduction, trim=0.2):
+    """TODO DESCRIPTION
+
+    params:
+        * prediction (TODO): TODO
+        * target (TODO): TODO
+        * mask (TODO): TODO
+        * reduction (TODO): TODO
+        * trim (float) optional: TODO (default 0.2)
+
+    returns:
+        * (TODO): TODO
+    """
     M = torch.sum(mask, (1, 2))
     res = prediction - target
 
@@ -123,7 +186,20 @@ def trimmed_mae_loss(prediction, target, mask, reduction, trim=0.2):
 
 
 def ssi_mse_loss(pred_depth, gt_depth, mask, reduction, do_scale=True, do_shift=True):
+    """TODO DESCRIPTION
 
+    params:
+        * pred_depth (TODO): TODO
+        * gt_depth (TODO): TODO
+        * mask (TODO): TODO
+        * reduction (TODO): TODO
+        * do_scale (bool) optional: TODO (default True)
+        * do_shift (bool) optional: TODO (default True)
+
+    returns:
+        * ssi_mae_term (TODO): TODO
+        * grad_term (TODO): TODO
+    """
     # compute scale and shift values
     scale, shift = compute_scale_and_shift(pred_depth, gt_depth, mask)
 
@@ -153,7 +229,18 @@ def ssi_mse_loss(pred_depth, gt_depth, mask, reduction, do_scale=True, do_shift=
 
 
 def trim_mae_loss(pred_depth, gt_depth, mask, reduction):
+    """TODO DESCRIPTION
 
+    params:
+        * pred_depth (TODO): TODO
+        * gt_depth (TODO): TODO
+        * mask (TODO): TODO
+        * reduction (TODO): TODO
+
+    returns:
+        * trim_mae_term (TODO): TODO
+        * grad_term (TODO): TODO
+    """
     # normalized disparity -- zero translation and unit scaling
     pred_ssi = normalize_prediction_robust(pred_depth, mask)
     gt_ssi = normalize_prediction_robust(gt_depth, mask)
@@ -184,7 +271,19 @@ def midas_loss(
         loss_type='trim_mae',
         reduction='batch',
         alpha=0.5):
+    """TODO DESCRIPTION
 
+    params:
+        * gt_depth (TODO): TODO
+        * pred_depth (TODO): TODO
+        * mask (TODO): TODO
+        * loss_type (str) optional: TODO (default "trim_mae")
+        * reduction (TODO) optional: TODO (default "batch")
+        * alpha (float) optional: TODO (default 0.5)
+
+    returns:
+        * total_loss (TODO): TODO
+    """
     reduction = reduction_batch_based if reduction == 'batch' else reduction_image_based
 
     # downscaling image, gt depth and pred depth
