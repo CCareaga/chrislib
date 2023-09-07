@@ -1,40 +1,53 @@
-import sys
 import skimage
 import cv2
 import numpy as np
 
-from os.path import dirname, abspath
-
-parent_path = dirname(abspath(__file__))
-sys.path.append(parent_path)
-
 from general import round_32
 
+
 def resizewithpool(img, size):
+    """TODO DESCRIPTION
+
+    params:
+        * img (TODO): TODO
+        * size (TODO): TODO
+
+    returns:
+        * out (TODO): TODO
+    """
     i_size = img.shape[0]
     n = int(np.floor(i_size/size))
 
     out = skimage.measure.block_reduce(img, (n, n), np.max)
     return out
 
+
 def rgb2gray(rgb):
-    # Converts rgb to gray
+    """Converts rgb to gray
+
+    params:
+        * rgb (TODO): TODO
+
+    returns:
+        * (TODO): TODO
+    """
     return np.dot(rgb[..., :3], [0.2989, 0.5870, 0.1140])
 
+
 def calculateprocessingres(img, basesize, confidence=0.1, scale_threshold=3, whole_size_threshold=3000):
-    # Returns the R_x resolution described in section 5 of the main paper.
+    """ Returns the R_x resolution described in section 5 of the main paper.
 
-    # Parameters:
-    #    img :input rgb image
-    #    basesize : size the dilation kernel which is equal to receptive field of the network.
-    #    confidence: value of x in R_x; allowed percentage of pixels that are not getting any contextual cue.
-    #    scale_threshold: maximum allowed upscaling on the input image ; it has been set to 3.
-    #    whole_size_threshold: maximum allowed resolution. (R_max from section 6 of the main paper)
+    params:
+        * img (TODO): input rgb image
+        * basesize (TODO): size the dilation kernel which is equal to receptive field of the network
+        * confidence (float) optional: value of x in R_x; allowed percentage of pixels that are not getting any contextual cue (default 0.1)
+        * scale_threshold (int) optional: maximum allowed upscaling on the input image (default 3)
+        * whole_size_threshold (int) optional: maximum allowed resolution (R_max from section 6 of the main paper) (default 3000)
 
-    # Returns:
-    #    outputsize_scale*speed_scale :The computed R_x resolution
-    #    patch_scale: K parameter from section 6 of the paper
-
+    returns:
+        * (int): The computed R_x resolution
+        * patch_scale (float): K parameter from section 6 of the paper
+    """
     # speed scale parameter is to process every image in a smaller size to accelerate the R_x resolution search
     speed_scale = 32
     image_dim = int(min(img.shape[0:2]))
@@ -78,7 +91,18 @@ def calculateprocessingres(img, basesize, confidence=0.1, scale_threshold=3, who
 
     return int(outputsize_scale*speed_scale), patch_scale
 
+
 def get_optimal_dims(img, conf):
+    """TODO DESCRIPTION
+
+    params:
+        * img (TODO): TODO
+        * conf (TODO): TODO
+
+    returns:
+        * opt_h (TODO): TODO
+        * opt_w (TODO): TODO
+    """
     h, w, _ = img.shape 
 
     # get the larger of the two dimensions and determine the scale 
@@ -98,9 +122,17 @@ def get_optimal_dims(img, conf):
 
     return opt_h, opt_w
 
-def optimal_resize(img, conf=0.01):
 
+def optimal_resize(img, conf=0.01):
+    """TODO DESCRIPTION
+
+    params:
+        * img (TODO): TODO
+        * conf (float) optional: TODO (default 0.01)
+
+    returns:
+        * (TODO): TODO
+    """
     opt_h, opt_w = get_optimal_dims(img, conf) 
 
     return skimage.transform.resize(img, (opt_h, opt_w), order=1, preserve_range=True)
-

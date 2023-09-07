@@ -22,6 +22,7 @@ Welcome to chrislib's documentation!
    normal_util
    ordinal_util
    pipeline
+   resolution_util
 
 Indices and tables
 ==================
