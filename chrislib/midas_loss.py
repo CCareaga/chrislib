@@ -5,6 +5,8 @@ source: https://gist.github.com/ranftlr/1d6194db2e1dffa0a50c9b0a9549cbd2
 
 import torch
 
+from chrislib.loss import compute_scale_and_shift
+
 EPSILON = 1e-6
 _dtype = torch.float32
 
@@ -45,43 +47,6 @@ def reduction_image_based(image_loss, M):
     image_loss[valid] = image_loss[valid] / M[valid]
 
     return torch.mean(image_loss)
-
-
-def compute_scale_and_shift(prediction, target, mask):
-    """TODO DESCRIPTION
-
-    params:
-        prediction (TODO): TODO
-        target (TODO): TODO
-        mask (TODO): TODO
-
-    returns:
-        x_0 (TODO): TODO
-        x_1 (TODO): TODO
-    """
-    # system matrix: A = [[a_00, a_01], [a_10, a_11]]
-    a_00 = torch.sum(mask * prediction * prediction, (1, 2))
-    a_01 = torch.sum(mask * prediction, (1, 2))
-    a_11 = torch.sum(mask, (1, 2))
-
-    # right hand side: b = [b_0, b_1]
-    b_0 = torch.sum(mask * prediction * target, (1, 2))
-    b_1 = torch.sum(mask * target, (1, 2))
-
-    # solution: x = A^-1 . b = [[a_11, -a_01], [-a_10, a_00]] / (a_00 * a_11 -
-    # a_01 * a_10) . b
-    x_0 = torch.zeros_like(b_0)
-    x_1 = torch.zeros_like(b_1)
-
-    det = a_00 * a_11 - a_01 * a_01
-    valid = det.nonzero()
-
-    x_0[valid] = (a_11[valid] * b_0[valid] -
-                  a_01[valid] * b_1[valid]) / det[valid]
-    x_1[valid] = (-a_01[valid] * b_0[valid] +
-                  a_00[valid] * b_1[valid]) / det[valid]
-
-    return x_0, x_1
 
 
 def midas_mse_loss(pred_depth, gt_depth, mask, reduction):
