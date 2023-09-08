@@ -8,13 +8,13 @@ def compute_scale_and_shift(prediction, target, mask):
     criteria between the prediction and the target in the masked area
 
     params:
-        * pred (torch.Tensor): network prediction tensor (B x H x W)
-        * grnd (torch.Tensor): ground truth tensor (B x H x W)
-        * mask (torch.Tensor): mask denoting valid pixels (must be B x H x W)
+        pred (torch.Tensor): network prediction tensor (B x H x W)
+        grnd (torch.Tensor): ground truth tensor (B x H x W)
+        mask (torch.Tensor): mask denoting valid pixels (must be B x H x W)
 
     returns:
-        * x_0 (torch.Tensor): scales (B)
-        * x_1 (torch.Tensor): shifts (B)
+        x_0 (torch.Tensor): scales (B)
+        x_1 (torch.Tensor): shifts (B)
     """
     # system matrix: A = [[a_00, a_01], [a_10, a_11]]
     a_00 = torch.sum(mask * prediction * prediction, (1, 2))
@@ -45,12 +45,12 @@ def compute_ssi_pred(pred, grnd, mask):
     minimize the L2 difference with the ground truth in the masked area
 
     params:
-        * pred (torch.Tensor): network prediction tensor (B x H x W)
-        * grnd (torch.Tensor): ground truth tensor (B x H x W)
-        * mask (torch.Tensor): mask denoting valid pixels (must be B x H x W)
+        pred (torch.Tensor): network prediction tensor (B x H x W)
+        grnd (torch.Tensor): ground truth tensor (B x H x W)
+        mask (torch.Tensor): mask denoting valid pixels (must be B x H x W)
 
     returns:
-        * (TODO): the network prediction optimally shifted and scaled
+        (TODO): the network prediction optimally shifted and scaled
     """
     scale, shift = compute_scale_and_shift(pred, grnd, mask)
 
@@ -68,13 +68,13 @@ def lp_loss(pred, grnd, mask, p=2):
     compute both MSE (p=2) and L1 (p=1) loss functions
 
     params:
-        * pred (torch.Tensor): network prediction tensor (B x C x H x W)
-        * grnd (torch.Tensor): ground truth tensor (B x C x H x W)
-        * mask (torch.Tensor): mask denoting valid pixels (must be B x 1 x H x W)
-        * p (int) optional: degree of L norm (default 2)
+        pred (torch.Tensor): network prediction tensor (B x C x H x W)
+        grnd (torch.Tensor): ground truth tensor (B x C x H x W)
+        mask (torch.Tensor): mask denoting valid pixels (must be B x 1 x H x W)
+        p (int) optional: degree of L norm (default 2)
 
     returns:
-        * (TODO): the mean LP loss between pixels in prediction and ground truth
+        (TODO): the mean LP loss between pixels in prediction and ground truth
     """
     if p == 1:
         lp_term = torch.nn.functional.l1_loss(pred, grnd, reduction='none') * mask
@@ -88,19 +88,19 @@ class MSGLoss():
     """Multi-scale Gradient Loss implementation
 
     params:
-        * scales (int) optional: TODO (default 4)
-        * taps (list) optional: TODO (default [1,1,1,1])
-        * k_size (list) optional: TODO (default [3,3,3,3])
-        * device (str) optional: TODO (default None)
+        scales (int) optional: TODO (default 4)
+        taps (list) optional: TODO (default [1,1,1,1])
+        k_size (list) optional: TODO (default [3,3,3,3])
+        device (str) optional: TODO (default None)
     """
     def __init__(self, scales=4, taps=[1, 1, 1, 1], k_size=[3, 3, 3, 3], device=None):
         """Create an instance of MSGLoss.
 
         params:
-            * scales (int) optional: TODO (default 4)
-            * taps (list) optional: TODO (default [1,1,1,1])
-            * k_size (list) optional: TODO (default [3,3,3,3])
-            * device (str) optional: TODO (default None)
+            scales (int) optional: TODO (default 4)
+            taps (list) optional: TODO (default [1,1,1,1])
+            k_size (list) optional: TODO (default [3,3,3,3])
+            device (str) optional: TODO (default None)
         """
         self.n_scale = scales
         self.taps = taps
@@ -122,7 +122,7 @@ class MSGLoss():
         """TODO DESCRIPTION
 
         params:
-            * device (str): TODO
+            device (str): TODO
         """
         self.imgDerivative.to_device(device)
         self.device = device
@@ -133,12 +133,12 @@ class MSGLoss():
         """TODO DESCRIPTION
 
         params:
-            * output (TODO): TODO
-            * target (TODO): TODO
-            * mask (TODO) optional: TODO (default None)
+            output (TODO): TODO
+            target (TODO): TODO
+            mask (TODO) optional: TODO (default None)
 
         returns:
-            * (TODO): TODO
+            (TODO): TODO
         """
         return self.forward(output, target, mask)
 
@@ -147,12 +147,12 @@ class MSGLoss():
         """TODO DESCRIPTION
 
         params:
-            * output (TODO): TODO
-            * target (TODO): TODO
-            * mask (TODO): TODO
+            output (TODO): TODO
+            target (TODO): TODO
+            mask (TODO): TODO
 
         returns:
-            * loss (TODO): TODO
+            loss (TODO): TODO
         """
         diff = output - target
 
@@ -187,11 +187,11 @@ class MSGLoss():
         """TODO DESCRIPTION
 
         params:
-            * img (TODO): TODO
-            * scale (TODO): TODO
+            img (TODO): TODO
+            scale (TODO): TODO
 
         returns:
-            * (TODO): TODO
+            (TODO): TODO
         """
         if scale == 0:
             return img
@@ -209,11 +209,11 @@ class MSGLoss():
         """TODO DESCRIPTION
 
         params:
-            * diff (TODO): TODO
-            * scale (TODO): TODO
+            diff (TODO): TODO
+            scale (TODO): TODO
 
         returns:
-            * grad_magnitude (TODO): TODO
+            grad_magnitude (TODO): TODO
         """
         # B x C x H x W
         grad_x, grad_y = self.imgDerivative(diff, self.taps[scale])
@@ -228,13 +228,13 @@ class ImageDerivative():
     """TODO DESCRIPTION
 
     params:
-        * device (str) optional: TODO (default None)
+        device (str) optional: TODO (default None)
     """
     def __init__(self, device=None):
         """Creates an instance of ImageDerivative
 
         params:
-            * device (str) optional: TODO (default None)
+            device (str) optional: TODO (default None)
         """
         # seperable kernel: first derivative, second prefiltering
         tap_3 = torch.tensor([[0.425287, -0.0000, -0.425287], [0.229879, 0.540242, 0.229879]])
@@ -256,7 +256,7 @@ class ImageDerivative():
         """TODO DESCRIPTION
 
         params:
-            * device (str): TODO
+            device (str): TODO
         """
         self.kernels = [kernel.to(device) for kernel in self.kernels]
 
@@ -265,11 +265,11 @@ class ImageDerivative():
         """TODO DESCRIPTION
 
         params:
-            * img (TODO): image with dimensions B x C x H x W
-            * t_id (int): tap radius (for example t_id=1 will use the tap 3)
+            img (TODO): image with dimensions B x C x H x W
+            t_id (int): tap radius (for example t_id=1 will use the tap 3)
 
         returns:
-            * (TODO): TODO
+            (TODO): TODO
         """
         if t_id == 3 or t_id == 5:
             assert False, "Not Implemented"
@@ -281,11 +281,11 @@ class ImageDerivative():
         """TODO DESCRIPTION
 
         params:
-            * img (TODO): image with dimensions B x C x H x W
-            * t_id (int) optional: tap radius (for example t_id=1 will use the tap 3) (default 1)
+            img (TODO): image with dimensions B x C x H x W
+            t_id (int) optional: tap radius (for example t_id=1 will use the tap 3) (default 1)
 
         returns:
-            * (tuple): TODO
+            (tuple): TODO
         """
         kernel = self.kernels[t_id-1]
 
