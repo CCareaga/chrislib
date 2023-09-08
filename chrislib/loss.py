@@ -1,7 +1,7 @@
 import kornia.filters as kn_filters
 import kornia.morphology as kn_morph
-import torchvision.transforms.functional as TF
 import torch
+
 
 def compute_scale_and_shift(prediction, target, mask):
     """Computes the optimal scale and shift according to least-squares
@@ -54,7 +54,7 @@ def compute_ssi_pred(pred, grnd, mask):
     """
     scale, shift = compute_scale_and_shift(pred, grnd, mask)
 
-    # NOTE: early in training this scale can be negative, so we can simply clip it 
+    # NOTE: early in training this scale can be negative, so we can simply clip it
     # at zero. It could also probably just be set to one if less than 0, it's just
     # to help stabilize early training until the network is making reasonable preds
     scale = torch.nn.functional.relu(scale)
@@ -80,7 +80,7 @@ def lp_loss(pred, grnd, mask, p=2):
         lp_term = torch.nn.functional.l1_loss(pred, grnd, reduction='none') * mask
     if p == 2:
         lp_term = torch.nn.functional.mse_loss(pred, grnd, reduction='none') * mask
-                       
+
     return lp_term.sum() / (mask.sum() * lp_term.shape[1])
 
 
@@ -107,7 +107,9 @@ class MSGLoss():
         self.k_size = k_size
         self.device = device
 
+        # pylint: disable-next=line-too-long
         assert len(self.taps) == self.n_scale, 'number of scales and number of taps must be the same'
+        # pylint: disable-next=line-too-long
         assert len(self.k_size) == self.n_scale, 'number of scales and number of kernels must be the same'
 
         self.imgDerivative = ImageDerivative()
@@ -178,6 +180,7 @@ class MSGLoss():
             # average the per pixel diffs
             temp = mask_resized * grad_mag
 
+            # pylint: disable-next=line-too-long
             loss += torch.sum(mask_resized * grad_mag) / (torch.sum(mask_resized) * grad_mag.shape[1])
 
         loss /= self.n_scale
@@ -201,7 +204,12 @@ class MSGLoss():
         # blurred = img
 
         # NOTE: interpolate is noticeably faster than blur and sub-sample
-        scaled = torch.nn.functional.interpolate(img, scale_factor=1/(2**scale), mode='bilinear', align_corners=True, antialias=True)
+        scaled = torch.nn.functional.interpolate(
+            img,
+            scale_factor=1/(2**scale),
+            mode='bilinear',
+            align_corners=True,
+            antialias=True)
         return scaled
 
 
@@ -237,13 +245,22 @@ class ImageDerivative():
             device (str) optional: TODO (default None)
         """
         # seperable kernel: first derivative, second prefiltering
-        tap_3 = torch.tensor([[0.425287, -0.0000, -0.425287], [0.229879, 0.540242, 0.229879]])
-        tap_5 = torch.tensor([[0.109604,  0.276691,  0.000000, -0.276691, -0.109604], [0.037659,  0.249153,  0.426375,  0.249153,  0.037659]])
+        tap_3 = torch.tensor([
+            [0.425287, -0.0000, -0.425287],
+            [0.229879, 0.540242, 0.229879]])
+        tap_5 = torch.tensor([
+            [0.109604,  0.276691,  0.000000, -0.276691, -0.109604],
+            [0.037659,  0.249153,  0.426375,  0.249153,  0.037659]])
         tap_7 = torch.tensor([0])
-        tap_9 = torch.tensor([[0.0032, 0.0350, 0.1190, 0.1458, -0.0000, -0.1458, -0.1190, -0.0350, -0.0032], [0.0009, 0.0151, 0.0890, 0.2349, 0.3201, 0.2349, 0.0890, 0.0151, 0.0009]])
+        tap_9 = torch.tensor([
+            [0.0032, 0.0350, 0.1190, 0.1458, -0.0000, -0.1458, -0.1190, -0.0350, -0.0032],
+            [0.0009, 0.0151, 0.0890, 0.2349, 0.3201, 0.2349, 0.0890, 0.0151, 0.0009]])
         tap_11 = torch.tensor([0])
-        tap_13 = torch.tensor([[0.0001, 0.0019, 0.0142, 0.0509, 0.0963, 0.0878, 0.0000, -0.0878, -0.0963, -0.0509, -0.0142, -0.0019, -0.0001],
-                               [0.0000, 0.0007, 0.0071, 0.0374, 0.1126, 0.2119, 0.2605, 0.2119, 0.1126, 0.0374, 0.0071, 0.0007, 0.0000]])
+        tap_13 = torch.tensor([
+            [0.0001, 0.0019, 0.0142, 0.0509, 0.0963, 0.0878, 0.0000,
+             -0.0878, -0.0963, -0.0509, -0.0142, -0.0019, -0.0001],
+            [0.0000, 0.0007, 0.0071, 0.0374, 0.1126, 0.2119, 0.2605,
+             0.2119, 0.1126, 0.0374, 0.0071, 0.0007, 0.0000]])
 
         self.kernels = [tap_3, tap_5, tap_7, tap_9, tap_11, tap_13]
 
@@ -271,7 +288,7 @@ class ImageDerivative():
         returns:
             (TODO): TODO
         """
-        if t_id == 3 or t_id == 5:
+        if t_id in [3, 5]:
             assert False, "Not Implemented"
 
         return self.forward(img, t_id)
@@ -293,7 +310,19 @@ class ImageDerivative():
         d1 = kernel[0 : 1, ...]
 
         # B x C x H x W
-        grad_x = kn_filters.filter2d_separable(img, p, d1, border_type='reflect', normalized=False, padding='same')
-        grad_y = kn_filters.filter2d_separable(img, d1, p, border_type='reflect', normalized=False, padding='same')
+        grad_x = kn_filters.filter2d_separable(
+            img,
+            p,
+            d1,
+            border_type='reflect',
+            normalized=False,
+            padding='same')
+        grad_y = kn_filters.filter2d_separable(
+            img,
+            d1,
+            p,
+            border_type='reflect',
+            normalized=False,
+            padding='same')
 
         return (grad_x, grad_y)

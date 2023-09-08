@@ -2,7 +2,7 @@ import torch
 import numpy as np
 from skimage.transform import resize
 
-from general import round_32, minmax, get_brightness
+from chrislib.general import round_32, minmax, get_brightness
 
 
 def base_resize(img, base_size=384):
@@ -91,25 +91,25 @@ def ordinal_forward(model, img, normalize=False, dev='cuda'):
         (TODO): TODO
     """
     fh, fw, _ = img.shape
-    
+
     base_input = base_resize(img)
     full_input = full_resize(img)
-    
+
     base_input = torch.from_numpy(base_input).permute(2, 0, 1).to(dev).float()
     full_input = torch.from_numpy(full_input).permute(2, 0, 1).to(dev).float()
 
     with torch.no_grad():
         base_out = model(base_input.unsqueeze(0)).squeeze(0)
         full_out = model(full_input.unsqueeze(0)).squeeze(0)
-    
+
     if normalize:
         base_out = minmax(base_out)
         full_out = minmax(full_out)
-    
+
     base_out = base_out.cpu().numpy()
     full_out = full_out.cpu().numpy()
 
     base_est = resize(base_out, (fh, fw, 1))
     full_est = resize(full_out, (fh, fw, 1))
 
-    return equalize_predictions(img, base_est, full_est)    
+    return equalize_predictions(img, base_est, full_est)

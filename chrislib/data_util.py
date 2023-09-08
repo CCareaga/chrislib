@@ -1,11 +1,11 @@
 import os
 import random
+import urllib
+from io import BytesIO
+import requests
 from PIL import Image
 import numpy as np
 import torchvision.transforms.functional as TF
-import requests
-import urllib
-from io import BytesIO
 from bs4 import BeautifulSoup
 
 
@@ -18,7 +18,7 @@ def load_from_url(url):
     returns:
         (numpy.array): the image loaded as a numpy array
     """
-    response = requests.get(url)
+    response = requests.get(url, timeout=60)
     return load_image(BytesIO(response.content))
 
 
@@ -32,7 +32,7 @@ def load_image(path, bits=8):
     returns:
         (numpy.array): the image loaded as a numpy array
     """
-    np_arr = np.array(Image.open(path)).astype(np.float32) 
+    np_arr = np.array(Image.open(path)).astype(np.float32)
     return np_arr / float((2 ** bits) - 1)
 
 
@@ -82,7 +82,7 @@ def random_color_jitter(img):
     """
     hue_shft = (random.randint(0, 50) / 50.) - 0.5
     hue_img = TF.adjust_hue(img, hue_shft)
-    
+
     sat_shft = (random.randint(0, 50) / 50.) + 0.5
     sat_img = TF.adjust_saturation(hue_img, sat_shft)
 
@@ -95,7 +95,8 @@ def random_color_jitter(img):
 
 
 def random_crop_and_resize(images, output_size=384,  min_crop=128):
-    """Randomly (within the given output_size and min_crop constraints) resize and crop a set of images.
+    """Randomly (within the given output_size and min_crop constraints) resize and crop a set of
+    images.
 
     params:
         images (TODO): TODO
@@ -106,14 +107,14 @@ def random_crop_and_resize(images, output_size=384,  min_crop=128):
         images (TODO): cropped and reiszed images
     """
     _, h, w = images[0].shape
-    
+
     max_crop = min(h, w)
-    
+
     rand_crop = random.randint(min_crop, max_crop)
-    
+
     rand_top = random.randint(0, h - rand_crop)
     rand_left = random.randint(0, w - rand_crop)
-    
+
     images = [TF.crop(x, rand_top, rand_left, rand_crop, rand_crop) for x in images]
     images = [TF.resize(x, (output_size, output_size)) for x in images]
 
@@ -131,9 +132,8 @@ def random_flip(images, p=0.5):
         (TODO): TODO
     """
     if random.random() > p:
-        return [TF.hflip(x) for x in images]
-    else:
-        return images
+        images = [TF.hflip(x) for x in images]
+    return images
 
 
 def get_main_img(soup):
@@ -145,12 +145,16 @@ def get_main_img(soup):
     returns:
         link (str): the link to the main image from the soup content
     """
+    ret_link = ""
     for entry in soup.findAll('a'):
         link = entry.get('href')
-        if link is None: continue
+        if link is None:
+            continue
 
         if 'http://labelmaterial.s3.amazonaws.com/photos/' in link:
-            return link
+            ret_link = link
+            break
+    return ret_link
 
 
 def load_opensurfaces_image(id_num):
@@ -166,13 +170,13 @@ def load_opensurfaces_image(id_num):
     IMAGE_PATH = '/home/chris/research/intrinsic/data/opensurfaces/images'
 
     url = f'http://opensurfaces.cs.cornell.edu/photos/{id_num}/'
-    r = requests.get(url)
+    r = requests.get(url, timeout=60)
     content = r.content
-    
+
     soup = BeautifulSoup(content)
-    
+
     img_url = get_main_img(soup)
-    
+
     img_base = img_url.split('/')[-1]
     img_path = os.path.join(IMAGE_PATH, img_base)
 
@@ -185,5 +189,5 @@ def load_opensurfaces_image(id_num):
 
     h, w, _ = img_arr.shape
     print(h, w)
-    
+
     return img_arr, soup

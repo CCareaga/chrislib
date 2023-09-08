@@ -3,7 +3,10 @@ import torch
 import numpy as np
 import cv2
 from skimage.transform import resize
-from general import round_32
+from omnidata_tools.torch.modules.midas.dpt_depth import DPTDepthModel
+
+from chrislib.general import round_32
+
 
 
 def load_omni_model(omni_dir):
@@ -18,12 +21,9 @@ def load_omni_model(omni_dir):
     sys.path.append(omni_dir)
 
     omni_model_dir = f'{omni_dir}/omnidata_tools/torch/pretrained_models/'
-    
-    from omnidata_tools.torch.modules.midas.dpt_depth import DPTDepthModel
-    from omnidata_tools.torch.data.transforms import get_transform
 
     image_size = 384
-    
+
     pretrained_weights_path = omni_model_dir + 'omnidata_dpt_normal_v2.ckpt'
     model = DPTDepthModel(backbone='vitb_rn50_384', num_channels=3) # DPT Hybrid
     checkpoint = torch.load(pretrained_weights_path, map_location='cuda')
@@ -37,7 +37,7 @@ def load_omni_model(omni_dir):
 
     model.load_state_dict(state_dict)
     model.to('cuda')
-    
+
     return model
 
 
@@ -59,19 +59,19 @@ def get_omni_normals(model, img, zero_one=True):
 
     if img_tensor.shape[1] == 1:
         img_tensor = img_tensor.repeat_interleave(3,1)
-    
+
     with torch.no_grad():
         output = model(img_tensor.unsqueeze(0)).clamp(min=0, max=1)[0]
         output[1, :, :] = 1 - output[1, :, :]
         output[2, :, :] = 1 - output[2, :, :]
-        
+
         if not zero_one:
             output = (output * 2.0) - 1.0
 
         np_out = output.permute(1, 2, 0).detach().cpu().numpy()
-        
+
     np_out = resize(np_out, (h, w), anti_aliasing=True)
-    
+
     return np_out
 
 
@@ -111,12 +111,12 @@ def angular_error(gt, pred, mask):
     returns:
         (TODO): TODO
     """
-    gt = gt.astype(np.float64) 
-    pred = pred.astype(np.float64) 
+    gt = gt.astype(np.float64)
+    pred = pred.astype(np.float64)
 
     gt /= np.linalg.norm(gt, axis=-1, keepdims=True).clip(1e-4)
     pred /= np.linalg.norm(pred, axis=-1, keepdims=True).clip(1e-4)
-    
+
     # compute the vector product between gt and prediction for each pixel
     dot_prod = (gt * pred).sum(axis=-1)
 
@@ -130,7 +130,8 @@ def angular_error(gt, pred, mask):
 
 
 def compute_metrics(ang_err):
-    """Six surface normal metrics following: https://web.eecs.umich.edu/~fouhey/2016/evalSN/evalSN.html
+    """Six surface normal metrics following:
+    https://web.eecs.umich.edu/~fouhey/2016/evalSN/evalSN.html
 
     params:
         ang_err (TODO): TODO
@@ -166,14 +167,14 @@ def depth_to_normals(depth, k=7, perc=90):
         normal (TODO): TODO
     """
     h, w = depth.shape
-    
+
     # compute x and y gradients with sobel
-    x = cv2.Sobel(depth, cv2.CV_64F, 1, 0, ksize=k)     
+    x = cv2.Sobel(depth, cv2.CV_64F, 1, 0, ksize=k)
     y = cv2.Sobel(depth, cv2.CV_64F, 0, 1, ksize=k)
 
     flat_x = x.reshape(-1)
     flat_y = y.reshape(-1)
-    
+
     # get the magnitude of all the gradients
     grad_mag = (flat_x ** 2) + (flat_y ** 2)
 
@@ -183,18 +184,18 @@ def depth_to_normals(depth, k=7, perc=90):
 
     # get the x and y values of the point with max gradient
     max_x, max_y = flat_x[max_pos], flat_y[max_pos]
-    
+
     # compute the scalar c, such that the max gradient position has a z-value of zero
     c_2 = 1.0 / ((max_x ** 2) + (max_y ** 2))
     c = np.sqrt(c_2)
-    
+
     # get the value of the magnitudes after scaling by c
-    scaled_mags = (((flat_x*c) ** 2) + ((flat_y*c) ** 2))
+    scaled_mags = ((flat_x*c) ** 2) + ((flat_y*c) ** 2)
 
     # get the magnitude of the scaled gradients
     # at the max_pos it should be very close to 1
     scaled_max = scaled_mags[max_pos]
-    assert(np.isclose(scaled_max, 1.0))
+    assert np.isclose(scaled_max, 1.0)
 
     # any magnitudes that were huge (past 90th percentile)
     # can be clipped to the same value as max_pos (1)
@@ -204,10 +205,10 @@ def depth_to_normals(depth, k=7, perc=90):
     # each pixel have a magnitude of 1
     z = 1.0 - scaled_mags
     z = z.reshape(h, w)
-    
-    # stack the components and then normalize, this will 
+
+    # stack the components and then normalize, this will
     # scale down the outliers whose magnitudes we clipped
     normal = np.stack((-x, y, z), axis=-1)
     normal /= np.linalg.norm(normal, axis=-1, keepdims=True)
 
-    return normal 
+    return normal

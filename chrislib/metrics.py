@@ -1,6 +1,6 @@
+import cv2
 import numpy as np
 from skimage.segmentation import slic, mark_boundaries
-import torch
 
 EPSILON = 1e-6
 
@@ -81,7 +81,7 @@ def rmse_error(pred: np.ndarray, target: np.ndarray, mask:np.ndarray=None) -> fl
     returns:
         error (float): RMSE
     """
-    
+
     mask = mask if mask is not None else np.ones_like(pred)
 
     pred = pred[mask]
@@ -92,6 +92,7 @@ def rmse_error(pred: np.ndarray, target: np.ndarray, mask:np.ndarray=None) -> fl
     error = np.sqrt(np.sum(diff) / (valid_pixels + EPSILON))
 
     return error
+
 
 def absolute_relative_error(pred: np.ndarray, target: np.ndarray, mask:np.ndarray=None) -> float:
     """Absolute Relative Error.
@@ -104,7 +105,6 @@ def absolute_relative_error(pred: np.ndarray, target: np.ndarray, mask:np.ndarra
     returns:
         error (float): ARE
     """
-    
     mask = mask if mask is not None else np.ones_like(pred)
 
     pred = pred[mask]
@@ -116,7 +116,9 @@ def absolute_relative_error(pred: np.ndarray, target: np.ndarray, mask:np.ndarra
 
     return error
 
+
 def delta_error(pred: np.ndarray, target: np.ndarray, mask:np.ndarray=None):
+    # pylint: disable-next=line-too-long
     """Delta Error: https://github.com/YvanYin/DiverseDepth/blob/master/Train/lib/utils/evaluate_depth_error.py#L132
 
     params: 
@@ -141,7 +143,9 @@ def delta_error(pred: np.ndarray, target: np.ndarray, mask:np.ndarray=None):
 
 
 def ssq_error(correct, estimate, mask):
-    """Compute the sum-squared-error for an image, where the estimate is multiplied by a scalar which minimizes the error. Sums over all pixels where mask is True. If the inputs are color, each color channel can be rescaled independently.
+    """Compute the sum-squared-error for an image, where the estimate is multiplied by a scalar
+    which minimizes the error. Sums over all pixels where mask is True. If the inputs are color,
+    each color channel can be rescaled independently.
 
     params:
         correct (TODO): TODO
@@ -173,13 +177,16 @@ def lmse(correct, estimate, mask, window_size, window_shift):
         (TODO): TODO
     """
     if len(correct.shape) == 2 or correct.shape[-1] == 1:
-        return lmse_gray(correct, estimate, mask, window_size, window_shift)
+        ret = lmse_gray(correct, estimate, mask, window_size, window_shift)
     else:
-        return lmse_rgb(correct, estimate, mask, window_size, window_shift)
+        ret = lmse_rgb(correct, estimate, mask, window_size, window_shift)
+    return ret
 
 
 def lmse_rgb(correct, estimate, mask, window_size, window_shift):
-    """Returns the sum of the local sum-squared-errors, where the estimate may be rescaled within each local region to minimize the error. The windows are window_size x window_size, and they are spaced by window_shift.
+    """Returns the sum of the local sum-squared-errors, where the estimate may be rescaled within
+    each local region to minimize the error. The windows are window_size x window_size, and they
+    are spaced by window_shift.
 
     params:
         correct (TODO): TODO
@@ -202,8 +209,16 @@ def lmse_rgb(correct, estimate, mask, window_size, window_shift):
             mask_curr = mask[i:i+window_size, j:j+window_size]
 
             rep_mask = np.concatenate([mask_curr] * 3, 0)
-            rep_cor = np.concatenate([correct_curr[:, :, 0], correct_curr[:, :, 1], correct_curr[:, :, 2]], 0)
-            rep_est = np.concatenate([estimate_curr[:, :, 0], estimate_curr[:, :, 1], estimate_curr[:, :, 2]], 0)
+            rep_cor = np.concatenate([
+                correct_curr[:, :, 0],
+                correct_curr[:, :, 1],
+                correct_curr[:, :, 2]],
+                0)
+            rep_est = np.concatenate([
+                estimate_curr[:, :, 0],
+                estimate_curr[:, :, 1],
+                estimate_curr[:, :, 2]],
+                0)
 
             ssq += ssq_error(rep_cor, rep_est, rep_mask)
             # FIX: in the original codebase, this was outdented, which allows
@@ -218,7 +233,9 @@ def lmse_rgb(correct, estimate, mask, window_size, window_shift):
 
 
 def lmse_gray(correct, estimate, mask, window_size, window_shift):
-    """Returns the sum of the local sum-squared-errors, where the estimate may be rescaled within each local region to minimize the error. The windows are window_size x window_size, and they are spaced by window_shift.
+    """Returns the sum of the local sum-squared-errors, where the estimate may be rescaled within
+    each local region to minimize the error. The windows are window_size x window_size, and they
+    are spaced by window_shift.
 
     params:
         correct (TODO): TODO
@@ -252,7 +269,9 @@ def lmse_gray(correct, estimate, mask, window_size, window_shift):
 
 
 def lmse_downscale(correct, estimate, mask, window_size, window_shift, downscale):
-    """Returns the sum of the local sum-squared-errors, where the estimate may be rescaled within each local region to minimize the error. The windows are window_size x window_size, and they are spaced by window_shift.
+    """Returns the sum of the local sum-squared-errors, where the estimate may be rescaled within
+    each local region to minimize the error. The windows are window_size x window_size, and they
+    are spaced by window_shift.
 
     params:
         correct (TODO): TODO
@@ -270,24 +289,26 @@ def lmse_downscale(correct, estimate, mask, window_size, window_shift, downscale
 
     for i in range(0, M - window_size + 1, window_shift):
         for j in range(0, N - window_size + 1, window_shift):
-            
             correct_curr = correct[i:i+window_size, j:j+window_size]
             estimate_curr = estimate[i:i+window_size, j:j+window_size]
             mask_curr = mask[i:i+window_size, j:j+window_size]
-            
+
             res_cor_curr = cv2.resize(correct_curr, (downscale, downscale))
             res_est_curr = cv2.resize(estimate_curr, (downscale, downscale))
-            
-            res_msk_curr = cv2.resize(mask_curr.astype(np.float32), (downscale, downscale), cv2.INTER_NEAREST)
+
+            res_msk_curr = cv2.resize(
+                mask_curr.astype(np.float32),
+                (downscale, downscale),
+                cv2.INTER_NEAREST)
             res_msk_curr = res_msk_curr.astype(bool)
-            
+
             ssq += ssq_error(res_cor_curr, res_est_curr, res_msk_curr)
             # FIX: in the original codebase, this was outdented, which allows
             # for scores greater than 1 (which should not be possible).  On the
             # MIT dataset images, this makes a negligible difference, but on
             # larger images, this can have a significant effect.
             total += np.sum(res_msk_curr * res_cor_curr**2)
-            
+
     assert ~np.isnan(ssq/total)
 
     return ssq / total
@@ -322,24 +343,27 @@ def ssq_grad_error(correct, estimate, mask):
         cor_grad_mag (TODO): TODO
     """
     assert correct.ndim == 2
-    
-    # the mask is (h, w, 2) to compare gradients, 
+
+    # the mask is (h, w, 2) to compare gradients,
     # but sometimes we need the (h, w) version..
     single_mask = mask[:, :, 0]
-    
+
     if np.sum(estimate**2 * single_mask) > 1e-5:
         alpha = np.sum(correct * estimate * single_mask) / np.sum(estimate**2 * single_mask)
     else:
         alpha = 0.
-        
+
     scaled_est = alpha * estimate
     est_grad_mag = compute_grad(scaled_est)
     cor_grad_mag = compute_grad(correct)
-    
+
     return np.sum(mask * (cor_grad_mag - est_grad_mag) ** 2),  cor_grad_mag
 
+
 def grad_lmse(correct, estimate, mask, window_size, window_shift):
-    """Returns the sum of the local sum-squared-errors, where the estimate may be rescaled within each local region to minimize the error. The windows are window_size x window_size, and they are spaced by window_shift.
+    """Returns the sum of the local sum-squared-errors, where the estimate may be rescaled within
+    each local region to minimize the error. The windows are window_size x window_size, and they
+    are spaced by window_shift.
 
     params:
         correct (TODO): TODO
@@ -356,11 +380,10 @@ def grad_lmse(correct, estimate, mask, window_size, window_shift):
 
     for i in range(0, M - window_size + 1, window_shift):
         for j in range(0, N - window_size + 1, window_shift):
-            
             correct_curr = correct[i:i+window_size, j:j+window_size]
             estimate_curr = estimate[i:i+window_size, j:j+window_size]
             mask_curr = mask[i:i+window_size, j:j+window_size]
-            
+
             # repeat mask to create a two channel image
             mask_curr = np.stack([mask_curr] * 2, -1)
 
@@ -372,7 +395,7 @@ def grad_lmse(correct, estimate, mask, window_size, window_shift):
             # MIT dataset images, this makes a negligible difference, but on
             # larger images, this can have a significant effect.
             total += np.sum(mask_curr * corr_grad**2)
-            
+
     assert ~np.isnan(ssq/total)
 
     return ssq / total
@@ -391,7 +414,12 @@ def run_slic(gtdisp, nsamples, compactness=1):
         point_pairs (TODO): TODO
         seg_img (TODO): TODO
     """
-    segments = slic(gtdisp, n_segments=nsamples, compactness=compactness, start_label=0, slic_zero=True)
+    segments = slic(
+        gtdisp,
+        n_segments=nsamples,
+        compactness=compactness,
+        start_label=0,
+        slic_zero=True)
 
     segments_ids = np.unique(segments)
 
@@ -467,12 +495,23 @@ def fast_ordering(base, point_loc1, point_loc2, threshold, mode):
         (TODO): TODO
     """
     if mode == 'ratio':
-        return fast_ordering_ratio(base, point_loc1, point_loc2, threshold)
+        ret = fast_ordering_ratio(base, point_loc1, point_loc2, threshold)
     elif mode == 'diff':
-        return fast_ordering_diff(base, point_loc1, point_loc2, threshold)
+        ret = fast_ordering_diff(base, point_loc1, point_loc2, threshold)
+    return ret
 
 
-def fast_d3r(pred, target, freq_threshold, threshold, nsamples, mode='diff', debug=False, mask=None, compactness=1.0, slic=None):
+def fast_d3r(
+        pred,
+        target,
+        freq_threshold,
+        threshold,
+        nsamples,
+        mode='diff',
+        debug=False,
+        mask=None,
+        compactness=1.0,
+        slic_vals=None):
     """Compute D3R metric using diff instead of ratio to compute the ordinal relations.
 
     params:
@@ -485,16 +524,18 @@ def fast_d3r(pred, target, freq_threshold, threshold, nsamples, mode='diff', deb
         debug (bool) optional: whether to debug (default False)
         mask (TODO) optional: TODO (default None)
         compactness (float) optional: TODO (default 1.0)
-        slic (TODO) optional: TODO (default None)
+        slic_vals (TODO) optional: TODO (default None)
 
     returns:
-        (list of [float, list of tuples, list of tuples, 2darray]): computed error value, list of selected point pairs, list of point pairs that had mismatching orders, position of centers of superpixels
+        (list of [float, list of tuples, list of tuples, 2darray]): computed error value, list of
+            selected point pairs, list of point pairs that had mismatching orders, position of
+            centers of superpixels
     """
     gtdisp = target
     preddisp = pred
     mask = mask if mask is not None else np.ones_like(preddisp)
 
-    if slic is None:
+    if slic_vals is None:
         centers, point_pairs, seg_img = run_slic(
             gtdisp,
             nsamples,
@@ -502,8 +543,8 @@ def fast_d3r(pred, target, freq_threshold, threshold, nsamples, mode='diff', deb
         )
 
     else:
-        centers = slic['centers']
-        point_pairs = slic['point_pairs']
+        centers = slic_vals['centers']
+        point_pairs = slic_vals['point_pairs']
 
     not_matching_pairs = []
     selected_pairs = []
@@ -532,7 +573,7 @@ def fast_d3r(pred, target, freq_threshold, threshold, nsamples, mode='diff', deb
     d3r_error = d3r_error.sum() / (valid.sum() + EPSILON)
 
     if debug:
-        correct = (grnd_ordering == pred_ordering)
+        correct = grnd_ordering == pred_ordering
         return {
             # 'seg_img' : seg_img,
             'valid_mask' : valid,
@@ -546,13 +587,17 @@ def fast_d3r(pred, target, freq_threshold, threshold, nsamples, mode='diff', deb
 
 
 def compute_whdr(reflectance, judgements, delta=0.10):
-    """Return the WHDR score for a reflectance image, evaluated against human judgements. The return value is in the range 0.0 to 1.0, or None if there are no judgements for the image.  See section 3.5 of our paper for more details.
-    NOTE (chris): I stripped this directly from the file that is provided as part of the IIW dataset.
+    """Return the WHDR score for a reflectance image, evaluated against human judgements. The
+    return value is in the range 0.0 to 1.0, or None if there are no judgements for the image. See
+    section 3.5 of our paper for more details.
+    NOTE (chris): I stripped this directly from the file that is provided as part of the IIW
+    dataset.
 
     params:
         reflectance (np.ndarray): the linear RGB reflectance image.
         judgements (dict): a JSON object loaded from the Intrinsic Images in the Wild dataset
-        delta (TODO): the threshold where humans switch from saying "about the same" to "one point is darker"
+        delta (TODO): the threshold where humans switch from saying "about the same" to "one point
+            is darker"
 
     returns:
         (TODO): TODO
@@ -599,7 +644,7 @@ def compute_whdr(reflectance, judgements, delta=0.10):
             error_sum += weight
         weight_sum += weight
 
+    ret = None
     if weight_sum:
-        return error_sum / weight_sum
-    else:
-        return None
+        ret = error_sum / weight_sum
+    return ret

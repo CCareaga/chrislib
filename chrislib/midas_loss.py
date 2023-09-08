@@ -12,7 +12,7 @@ _dtype = torch.float32
 
 
 def reduction_batch_based(image_loss, M):
-    """Average of all valid pixels of the batch. Avoid division by 0 (if sum(M) = sum(sum(mask)) = 0: sum(image_loss) = 0)
+    """Average of all valid pixels of the batch. Avoid division by 0.
 
     params:
         image_loss (TODO): TODO
@@ -24,13 +24,14 @@ def reduction_batch_based(image_loss, M):
     divisor = torch.sum(M)
 
     if divisor == 0:
-        return 0
+        ret = 0
     else:
-        return torch.sum(image_loss) / divisor
+        ret = torch.sum(image_loss) / divisor
+    return ret
 
 
 def reduction_image_based(image_loss, M):
-    """Average of all valid pixels of an image. Avoid division by 0 (if sum(M) = sum(sum(mask)) = 0: sum(image_loss) = 0)
+    """Average of all valid pixels of an image. Avoid division by 0.
 
     params:
         image_loss (TODO): TODO
@@ -151,7 +152,7 @@ def normalize_prediction_robust(target, mask):
     m[valid] = torch.median(
         (mask[valid] * target[valid]).view(valid.sum(), -1), dim=1
     ).values
-    
+
     target = target - m.view(-1, 1, 1)
 
     sq = torch.sum(mask * target.abs(), (1, 2))
