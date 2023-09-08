@@ -7,8 +7,8 @@ def set_grad(nets, requires_grad):
     """TODO DESCRIPTION
 
     params:
-        * nets (TODO): TODO
-        * requires_grad (TODO): TODO
+        nets (TODO): TODO
+        requires_grad (TODO): TODO
     """
     if not isinstance(nets, list):
         nets = [nets]
@@ -22,10 +22,10 @@ def get_norm_layer(norm_type='instance'):
     """Return a normalization layer. For BatchNorm, we use learnable affine parameters and track running statistics (mean/stddev). For InstanceNorm, we do not use learnable affine parameters. We do not track running statistics.
 
     params:
-        * norm_type (str) optional: the name of the normalization layer. Must be one of ["batch", "instance", "none"] (default "instance")
+        norm_type (str) optional: the name of the normalization layer. Must be one of ["batch", "instance", "none"] (default "instance")
 
     returns:
-        * norm_layer (TODO): a normalization layer
+        norm_layer (TODO): a normalization layer
     """
     if norm_type == 'batch':
         norm_layer = functools.partial(nn.BatchNorm2d, affine=True, track_running_stats=True)
@@ -43,9 +43,9 @@ def init_weights(net, init_type='normal', init_gain=0.02):
     """Initialize network weights. We use 'normal' in the original pix2pix and CycleGAN paper. But xavier and kaiming might work better for some applications. Feel free to try yourself.
 
     params:
-        * net (TODO): network to be initialized
-        * init_type (str) optional: the name of an initialization method. Must be one of ["normal", "xavier", "kaiming", "orthogonal"] (default "normal")
-        * init_gain (float) optional: scaling factor for normal, xavier and orthogonal (default 0.02)
+        net (TODO): network to be initialized
+        init_type (str) optional: the name of an initialization method. Must be one of ["normal", "xavier", "kaiming", "orthogonal"] (default "normal")
+        init_gain (float) optional: scaling factor for normal, xavier and orthogonal (default 0.02)
     """
     def init_func(m):  # define the initialization function
         classname = m.__class__.__name__
@@ -71,15 +71,14 @@ def init_net(net, init_type='normal', init_gain=0.02, gpu_ids=[]):
     """Initialize a network: 1. register CPU/GPU device (with multi-GPU support); 2. initialize the network weights
 
     params:
-        * net (TODO): the network to be initialized
-        * init_type (str) optional: the name of an initialization method. Must be one of ["normal", "xavier", "kaiming", "orthogonal"] (default "normal")
-        * gain (float) optional: scaling factor for normal, xavier and orthogonal (default 0.02)
-        * gpu_ids (int list) optional: which GPUs the network runs on: e.g., 0,1,2 (default [])
+        net (TODO): the network to be initialized
+        init_type (str) optional: the name of an initialization method. Must be one of ["normal", "xavier", "kaiming", "orthogonal"] (default "normal")
+        gain (float) optional: scaling factor for normal, xavier and orthogonal (default 0.02)
+        gpu_ids (int list) optional: which GPUs the network runs on: e.g., 0,1,2 (default [])
 
     returns:
-        * net (TODO): an initialized network
+        net (TODO): an initialized network
     """
-
     # NOTE (chris): I can do the handling of the GPU placement manually
     # if len(gpu_ids) > 0:
     #     assert(torch.cuda.is_available())
@@ -92,20 +91,20 @@ class NLayerDiscriminator(nn.Module):
     """Defines a PatchGAN discriminator
 
     params:
-        * input_nc (int): the number of channels in input images
-        * ndf (int) optional: the number of filters in the last conv layer (default 64)
-        * n_layers (int) optional: the number of conv layers in the discriminator (default 3)
-        * norm_layer (TODO) optional: normalization layer (default nn.BatchNorm2d)
+        input_nc (int): the number of channels in input images
+        ndf (int) optional: the number of filters in the last conv layer (default 64)
+        n_layers (int) optional: the number of conv layers in the discriminator (default 3)
+        norm_layer (TODO) optional: normalization layer (default nn.BatchNorm2d)
     """
 
     def __init__(self, input_nc, ndf=64, n_layers=3, norm_layer=nn.BatchNorm2d):
         """Construct a PatchGAN discriminator
 
         params:
-            * input_nc (int): the number of channels in input images
-            * ndf (int) optional: the number of filters in the last conv layer (default 64)
-            * n_layers (int) optional: the number of conv layers in the discriminator (default 3)
-            * norm_layer (TODO) optional: normalization layer (default nn.BatchNorm2d)
+            input_nc (int): the number of channels in input images
+            ndf (int) optional: the number of filters in the last conv layer (default 64)
+            n_layers (int) optional: the number of conv layers in the discriminator (default 3)
+            norm_layer (TODO) optional: normalization layer (default nn.BatchNorm2d)
         """
         super(NLayerDiscriminator, self).__init__()
         if type(norm_layer) == functools.partial:  # no need to use bias as BatchNorm2d has affine parameters
@@ -143,10 +142,10 @@ class NLayerDiscriminator(nn.Module):
         """Standard forward pass.
 
         params:
-            * input (TODO): TODO
+            input (TODO): TODO
 
         returns:
-            * (TODO): TODO
+            (TODO): TODO
         """
         return self.model(input)
 
@@ -158,17 +157,17 @@ def define_D(input_nc, ndf, netD, n_layers_D=3, norm='batch', init_type='normal'
         * pixel: 1x1 PixelGAN discriminator can classify whether a pixel is real or not. It encourages greater color diversity but has no effect on spatial statistics.
 
     params:
-        * input_nc (int): the number of channels in input images
-        * ndf (int): the number of filters in the first conv layer
-        * netD (str): the architecture's name. Must be one of ["basic", "n_layers", "pixel"]
-        * n_layers_D (int) optional: the number of conv layers in the discriminator; effective when netD=='n_layers' (default 3)
-        * norm (str) optional: the type of normalization layers used in the network (default "batch")
-        * init_type (str) optional: the name of the initialization method (default "normal")
-        * init_gain (float) optional: scaling factor for normal, xavier and orthogonal (default 0.02)
-        * gpu_ids (int list) optional: which GPUs the network runs on: e.g., 0,1,2 (default [])
+        input_nc (int): the number of channels in input images
+        ndf (int): the number of filters in the first conv layer
+        netD (str): the architecture's name. Must be one of ["basic", "n_layers", "pixel"]
+        n_layers_D (int) optional: the number of conv layers in the discriminator; effective when netD=='n_layers' (default 3)
+        norm (str) optional: the type of normalization layers used in the network (default "batch")
+        init_type (str) optional: the name of the initialization method (default "normal")
+        init_gain (float) optional: scaling factor for normal, xavier and orthogonal (default 0.02)
+        gpu_ids (int list) optional: which GPUs the network runs on: e.g., 0,1,2 (default [])
 
     returns:
-        * (TODO): a discriminator
+        (TODO): a discriminator
     """
     net = None
     norm_layer = get_norm_layer(norm_type=norm)
@@ -190,18 +189,18 @@ class GANLoss(nn.Module):
     """Define different GAN objectives. The GANLoss class abstracts away the need to create the target label tensor that has the same size as the input. Do not use sigmoid as the last layer of Discriminator. LSGAN needs no sigmoid. vanilla GANs will handle it with BCEWithLogitsLoss.
 
     params:
-        * gan_mode (str): the type of GAN objective. It currently supports vanilla, lsgan, and wgangp
-        * target_real_label (bool) optional: label for a real image (default 1.0)
-        * target_fake_label (bool) optional: label of a fake image (default 0.0)
+        gan_mode (str): the type of GAN objective. It currently supports vanilla, lsgan, and wgangp
+        target_real_label (bool) optional: label for a real image (default 1.0)
+        target_fake_label (bool) optional: label of a fake image (default 0.0)
     """
 
     def __init__(self, gan_mode, target_real_label=1.0, target_fake_label=0.0):
         """ Initialize the GANLoss class. Note: Do not use sigmoid as the last layer of Discriminator. LSGAN needs no sigmoid. vanilla GANs will handle it with BCEWithLogitsLoss.
 
         params:
-            * gan_mode (str): the type of GAN objective. It currently supports vanilla, lsgan, and wgangp
-            * target_real_label (bool) optional: label for a real image (default 1.0)
-            * target_fake_label (bool) optional: label of a fake image (default 0.0)
+            gan_mode (str): the type of GAN objective. It currently supports vanilla, lsgan, and wgangp
+            target_real_label (bool) optional: label for a real image (default 1.0)
+            target_fake_label (bool) optional: label of a fake image (default 0.0)
         """
         super(GANLoss, self).__init__()
         self.register_buffer('real_label', torch.tensor(target_real_label))
@@ -221,11 +220,11 @@ class GANLoss(nn.Module):
         """Create label tensors with the same size as the input.
 
         params:
-            * prediction (tensor): tpyically the prediction from a discriminator
-            * target_is_real (bool): if the ground truth label is for real images or fake images
+            prediction (tensor): tpyically the prediction from a discriminator
+            target_is_real (bool): if the ground truth label is for real images or fake images
 
         returns:
-            * (TODO): a label tensor filled with ground truth label, and with the size of the input
+            (TODO): a label tensor filled with ground truth label, and with the size of the input
         """
 
         if target_is_real:
@@ -243,7 +242,7 @@ class GANLoss(nn.Module):
             target_is_real (bool): if the ground truth label is for real images or fake images
 
         Returns:
-            * (TODO): the calculated loss
+            (TODO): the calculated loss
         """
         if self.gan_mode in ['lsgan', 'vanilla']:
             target_tensor = self.get_target_tensor(prediction, target_is_real)

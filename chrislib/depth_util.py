@@ -29,12 +29,12 @@ def create_depth_models(device='cuda', midas_path=None, pix2pix_path=None):
     """TODO DESCRIPTION
 
     params:
-        * device (str) optional: TODO (default "cuda")
-        * midas_path (TODO) optional: TODO (default None)
-        * pix2pix_path (TODO) optional: TODO (default None)
+        device (str) optional: TODO (default "cuda")
+        midas_path (TODO) optional: TODO (default None)
+        pix2pix_path (TODO) optional: TODO (default None)
 
     returns:
-        * (list): TODO
+        (list): TODO
     """
     # opt = TestOptions().parse()
     opt = Namespace(Final=False, R0=False, R20=False, aspect_ratio=1.0, batch_size=1, checkpoints_dir=f'{curr_path}/BoostingMonocularDepth/pix2pix/checkpoints', colorize_results=False, crop_size=672, data_dir=None, dataroot=None, dataset_mode='depthmerge', depthNet=None, direction='AtoB', display_winsize=256, epoch='latest', eval=True, generatevideo=None, gpu_ids=[0], init_gain=0.02, init_type='normal', input_nc=2, isTrain=False, load_iter=0, load_size=672, max_dataset_size=10000, max_res=float('inf'), model='pix2pix4depth', n_layers_D=3, name='mergemodel', ndf=64, netD='basic', netG='unet_1024', net_receptive_field_size=None, ngf=64, no_dropout=False, no_flip=False, norm='none', num_test=50, num_threads=4, output_dir=None, output_nc=1, output_resolution=None, phase='test', pix2pixsize=None, preprocess='resize_and_crop', savecrops=None, savewholeest=None, serial_batches=False, suffix='', verbose=False)
@@ -70,12 +70,12 @@ def get_depth(img, models, threshold=0.2):
     """TODO DESCRIPTION
 
     params:
-        * img (TODO): TODO
-        * models (TODO): TODO
-        * threshold (float) optional: TODO (default 0.2)
+        img (TODO): TODO
+        models (TODO): TODO
+        threshold (float) optional: TODO (default 0.2)
 
     returns:
-        * whole_estimate (TODO): TODO
+        whole_estimate (TODO): TODO
     """
     pix2pixmodel, midasmodel = models
 
@@ -113,15 +113,15 @@ def doubleestimate(img, size1, size2, pix2pixsize, pix2pixmodel, midasmodel):
     """TODO DESCRIPTION
 
     params:
-        * img (TODO): TODO
-        * size1 (TODO): TODO
-        * size2 (TODO): TODO
-        * pix2pixsize (TODO): TODO
-        * pix2pixmodel (TODO): TODO
-        * midasmodel (TODO): TODO
+        img (TODO): TODO
+        size1 (TODO): TODO
+        size2 (TODO): TODO
+        pix2pixsize (TODO): TODO
+        pix2pixmodel (TODO): TODO
+        midasmodel (TODO): TODO
 
     returns:
-        * prediction_mapped (TODO): TODO
+        prediction_mapped (TODO): TODO
     """
     # Generate the low resolution estimation
     estimate1 = singleestimate(img, size1, midasmodel)
@@ -151,12 +151,12 @@ def singleestimate(img, msize, midasmodel):
     """TODO DESCRIPTION
 
     params:
-        * img (TODO): TODO
-        * msize (TODO): TODO
-        * midasmodel (TODO): TODO
+        img (TODO): TODO
+        msize (TODO): TODO
+        midasmodel (TODO): TODO
 
     returns:
-        * (TODO): TODO
+        (TODO): TODO
     """
     if msize > GPU_threshold:
         # print(" \t \t DEBUG| GPU THRESHOLD REACHED", msize, '--->', GPU_threshold)
@@ -173,13 +173,13 @@ def estimatemidas(img, midasmodel, msize, device='cuda'):
     """TODO DESCRIPTION
 
     params:
-        * img (TODO): TODO
-        * midasmodel (TODO): TODO
-        * msize (TODO): TODO
-        * device (str) optional: TODO (default "cuda")
+        img (TODO): TODO
+        midasmodel (TODO): TODO
+        msize (TODO): TODO
+        device (str) optional: TODO (default "cuda")
 
     returns:
-        * prediction (TODO): TODO
+        prediction (TODO): TODO
     """
     # MiDas -v2 forward pass script adapted from https://github.com/intel-isl/MiDaS/tree/v2
     transform = Compose(
@@ -224,10 +224,10 @@ def write_depth(path, depth, bits=1 , colored=False):
     """Write depth map to pfm and png file.
 
     params:
-        * path (str): filepath without extension
-        * depth (array): depth
-        * bits (int) optional: TODO (default 1)
-        * colored (bool) optional: TODO (default False)
+        path (str): filepath without extension
+        depth (array): depth
+        bits (int) optional: TODO (default 1)
+        colored (bool) optional: TODO (default False)
     """
     # write_pfm(path + ".pfm", depth.astype(np.float32))
     if colored == True:

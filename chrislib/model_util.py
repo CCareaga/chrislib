@@ -11,12 +11,12 @@ def load_models(
     """TODO DESCRIPTION
 
     params:
-        * ord_path (str) optional: TODO (default path to vivid_bird_318_300.pt)
-        * mrg_path (str) optional: TODO (default path to fluent_eon_138_200.pt)
-        * device (str) optional: the device to run the model on (default "cuda")
+        ord_path (str) optional: TODO (default path to vivid_bird_318_300.pt)
+        mrg_path (str) optional: TODO (default path to fluent_eon_138_200.pt)
+        device (str) optional: the device to run the model on (default "cuda")
 
     returns:
-        * models (TODO): TODO
+        models (TODO): TODO
     """
     models = {}
 

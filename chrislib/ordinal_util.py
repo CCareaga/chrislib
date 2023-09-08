@@ -9,11 +9,11 @@ def base_resize(img, base_size=384):
     """TODO DESCRIPTION
 
     params:
-        * img (TODO): TODO
-        * base_size (int) optional: TODO (default 384)
+        img (TODO): TODO
+        base_size (int) optional: TODO (default 384)
 
     returns:
-        * net_input (TODO): TODO
+        net_input (TODO): TODO
     """
     h, w, _ = img.shape
 
@@ -31,10 +31,10 @@ def full_resize(img):
     """TODO DESCRIPTION
 
     params:
-        * img (TODO): TODO
+        img (TODO): TODO
 
     returns:
-        * net_input (TODO): TODO
+        net_input (TODO): TODO
     """
     h, w, _ = img.shape
     new_h, new_w = round_32(h), round_32(w)
@@ -47,14 +47,14 @@ def equalize_predictions(img, base, full, p=0.5):
     """TODO DESCRIPTION
 
     params:
-        * img (TODO): TODO
-        * base (TODO): TODO
-        * full (TODO): TODO
-        * p (int) optional: TODO (default 0.5)
+        img (TODO): TODO
+        base (TODO): TODO
+        full (TODO): TODO
+        p (int) optional: TODO (default 0.5)
 
     returns:
-        * base (TODO): TODO
-        * new_full (TODO): TODO
+        base (TODO): TODO
+        new_full (TODO): TODO
     """
     h, w, _ = img.shape
 
@@ -82,13 +82,13 @@ def ordinal_forward(model, img, normalize=False, dev='cuda'):
     """TODO DESCRIPTION
 
     params:
-        * model (TODO): TODO
-        * img (TODO): TODO
-        * normalize (bool) optional: TODO (default False)
-        * dev (str) optional: the device to run the model on (default "cuda")
+        model (TODO): TODO
+        img (TODO): TODO
+        normalize (bool) optional: TODO (default False)
+        dev (str) optional: the device to run the model on (default "cuda")
 
     returns:
-        * (TODO): TODO
+        (TODO): TODO
     """
     fh, fw, _ = img.shape
     

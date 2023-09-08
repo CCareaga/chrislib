@@ -21,11 +21,11 @@ def rgb2yuv(rgb, clip=True):
     """TODO DESCRIPTION
 
     params:
-        * rgb (TODO): TODO
-        * clip (bool) optional: TODO (default True)
+        rgb (TODO): TODO
+        clip (bool) optional: TODO (default True)
 
     returns:
-        * yuv (TODO): TODO
+        yuv (TODO): TODO
     """
     m = np.array([
         [0.299, -0.147,  0.615],
@@ -45,11 +45,11 @@ def yuv2rgb(yuv, clip=True):
     """TODO DESCRIPTION
 
     params:
-        * yuv (TODO): TODO
-        * clip (bool): TODO (default True)
+        yuv (TODO): TODO
+        clip (bool): TODO (default True)
 
     returns:
-        * rgb (TODO): TODO
+        rgb (TODO): TODO
     """
     m = np.array([
         [1.000,  1.000, 1.000],
@@ -69,11 +69,11 @@ def rgb2luv(rgb, eps=0.001):
     """TODO DESCRIPTION
 
     params:
-        * rgb (TODO): TODO
-        * eps (float): TODO (default 0.001)
+        rgb (TODO): TODO
+        eps (float): TODO (default 0.001)
 
     returns:
-        * (TODO): TODO
+        (TODO): TODO
     """
     r = rgb[:, :, 0]
     g = rgb[:, :, 1]
@@ -90,11 +90,11 @@ def luv2rgb(luv, eps=0.001):
     """TODO DESCRIPTION
 
     params:
-        * luv (TODO): TODO
-        * eps (float): TODO (default 0.001)
+        luv (TODO): TODO
+        eps (float): TODO (default 0.001)
 
     returns:
-        * (TODO): TODO
+        (TODO): TODO
     """
     l = luv[:, :, 0]
     u = uninvert(luv[:, :, 1], eps=eps)
@@ -111,11 +111,11 @@ def batch_rgb2luv(rgb, eps=0.001):
     """TODO DESCRIPTION
 
     params:
-        * rgb (TODO): TODO
-        * eps (float): TODO (default 0.001)
+        rgb (TODO): TODO
+        eps (float): TODO (default 0.001)
 
     returns:
-        * (TODO): TODO
+        (TODO): TODO
     """
     r = rgb[:, 0, :, :]
     g = rgb[:, 1, :, :]
@@ -132,11 +132,11 @@ def batch_luv2rgb(luv, eps=0.001):
     """TODO DESCRIPTION
 
     params:
-        * luv (TODO): TODO
-        * eps (float): TODO (default 0.001)
+        luv (TODO): TODO
+        eps (float): TODO (default 0.001)
 
     returns:
-        * (TODO): TODO
+        (TODO): TODO
     """
     l = luv[:, 0, :, :]
     u = uninvert(luv[:, 1, :, :], eps=eps)
@@ -153,11 +153,11 @@ def batch_rgb2iuv(rgb, eps=0.001):
     """TODO DESCRIPTION
 
     params:
-        * rgb (TODO): TODO
-        * eps (float): TODO (default 0.001)
+        rgb (TODO): TODO
+        eps (float): TODO (default 0.001)
 
     returns:
-        * (TODO): TODO
+        (TODO): TODO
     """
     r = rgb[:, 0, :, :]
     g = rgb[:, 1, :, :]
@@ -176,11 +176,11 @@ def batch_iuv2rgb(iuv, eps=0.001):
     """TODO DESCRIPTION
 
     params:
-        * iuv (TODO): TODO
-        * eps (float): TODO (default 0.001)
+        iuv (TODO): TODO
+        eps (float): TODO (default 0.001)
 
     returns:
-        * (TODO): TODO
+        (TODO): TODO
     """
     l = uninvert(iuv[:, 0, :, :], eps=eps)
     u = uninvert(iuv[:, 1, :, :], eps=eps)
@@ -399,9 +399,9 @@ def distinct_color(idx):
     """Get the distinct color hex at index idx from the DISTINCT_COLORS array.
 
     params:
-        * idx (int): the array index of the color to fetch
+        idx (int): the array index of the color to fetch
 
     returns:
-        * (str): the hex for the color in DISTINCT_COLORS at index idx
+        (str): the hex for the color in DISTINCT_COLORS at index idx
     """
     return DISTINCT_COLORS[idx]

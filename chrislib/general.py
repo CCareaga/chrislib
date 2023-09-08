@@ -13,11 +13,11 @@ def pad_bb(bounding_box, amount=7):
     """Add padding to all elements of a PIL ImageDraw text bounding box.
 
     params:
-        * bounding_box (tuple): the bounding box to add padding to - must have four integer elements: left, top, right, bottom
-        * amount (int) optional: the amount of padding to add (default 7)
+        bounding_box (tuple): the bounding box to add padding to - must have four integer elements: left, top, right, bottom
+        amount (int) optional: the amount of padding to add (default 7)
 
     returns:
-        * (tuple): bounding box tuple with padding added
+        (tuple): bounding box tuple with padding added
     """
     return (
         bounding_box[0] - amount,
@@ -31,10 +31,10 @@ def add_chan(img):
     """Add a channel dimension to an image.
 
     params:
-        * img (numpy.array): TODO
+        img (numpy.array): TODO
 
     returns:
-        * (numpy.array): the numpy image with an added channel dimension
+        (numpy.array): the numpy image with an added channel dimension
     """
     return np.stack([img] * 3, -1)
 
@@ -43,16 +43,16 @@ def _tile_row(images, text, border, font, font_pos, font_color, text_box):
     """TODO DESCRIPTION
 
     params:
-        * images (TODO): TODO
-        * text (TODO): TODO
-        * border (int): the size of border to add to each image
-        * font (TODO): TODO
-        * font_pos (tuple): the (x,y) coordinates to anchor the text (2 integers)
-        * font_color (tuple): the RGB values for the desired color (3 integers)
-        * text_box (TODO): TODO
+        images (TODO): TODO
+        text (TODO): TODO
+        border (int): the size of border to add to each image
+        font (TODO): TODO
+        font_pos (tuple): the (x,y) coordinates to anchor the text (2 integers)
+        font_color (tuple): the RGB values for the desired color (3 integers)
+        text_box (TODO): TODO
 
     returns:
-        * concat (TODO): TODO
+        concat (TODO): TODO
     """
     assert(len(images) == len(text))
 
@@ -95,22 +95,22 @@ def tile_imgs(images, rescale=1.0, text=None, font_size=16, font_file="/usr/shar
     """TODO DESCRIPTION
 
     params:
-        * images (TODO): TODO
-        * rescale (float) optional: the desired amount to rescale the tiled images (default 1.0)
-        * text (array-like) optional: TODO (default None)
-        * font_size (int) optional: the desired size of the font (default 16)
-        * font_file (str) optional: a filename or path to a file containing a TrueType font
-        * font_color (tuple) optional: the RGB values for the desired color (3 integers) (default None)
-        * font_pos (tuple) optional: the (x,y) coordinates to anchor the text (2 integers) (default (0, 0))
-        * text_box (TODO) optional: TODO (default None)
-        * display (bool) optional: whether to display the tiled images
-        * save (str) optional: the filename or path to save the tiled images to. Use None to not save (default None)
-        * border (int) optional: the size of border to add to each image (default 20)
-        * cmap (str) optional: the colormap for matplotlib to use to map scalar data to colors (default "viridis")
-        * quality (int) optional: the image quality to save with. Minimum (worst) is 0, maximum (best) is 90 (default 75)
+        images (TODO): TODO
+        rescale (float) optional: the desired amount to rescale the tiled images (default 1.0)
+        text (array-like) optional: TODO (default None)
+        font_size (int) optional: the desired size of the font (default 16)
+        font_file (str) optional: a filename or path to a file containing a TrueType font
+        font_color (tuple) optional: the RGB values for the desired color (3 integers) (default None)
+        font_pos (tuple) optional: the (x,y) coordinates to anchor the text (2 integers) (default (0, 0))
+        text_box (TODO) optional: TODO (default None)
+        display (bool) optional: whether to display the tiled images
+        save (str) optional: the filename or path to save the tiled images to. Use None to not save (default None)
+        border (int) optional: the size of border to add to each image (default 20)
+        cmap (str) optional: the colormap for matplotlib to use to map scalar data to colors (default "viridis")
+        quality (int) optional: the image quality to save with. Minimum (worst) is 0, maximum (best) is 90 (default 75)
 
     returns:
-        * tiled (TODO): TODO
+        tiled (TODO): TODO
     """
     if not isinstance(images, list):
         print("expected list of images")
@@ -169,9 +169,9 @@ def show(img, size=(16, 9), save=None):
     """TODO DESCRIPTION
 
     params:
-        * img (TODO): TODO
-        * size (tuple) optional: the integer width and height values (default (16,9))
-        * save (str) optional: the filename or path to save the tiled images to. Use None to not save (default None)
+        img (TODO): TODO
+        size (tuple) optional: the integer width and height values (default (16,9))
+        save (str) optional: the filename or path to save the tiled images to. Use None to not save (default None)
     """
     if isinstance(img, list):
         img = tile_imgs(img, save=save)
@@ -185,15 +185,15 @@ def match_scale(pred, grnd, mask=None, skip_close=False, threshold=0.001, subsam
     """TODO DESCRIPTION
 
     params:
-        * pred (TODO): TODO
-        * grnd (TODO): TODO
-        * mask (TODO) optional: TODO (default None)
-        * skip_close (bool) optional: TODO (default False)
-        * threshold (float) optional: TODO (default 0.001)
-        * subsample (float) optional: TODO (default 1.0)
+        pred (TODO): TODO
+        grnd (TODO): TODO
+        mask (TODO) optional: TODO (default None)
+        skip_close (bool) optional: TODO (default False)
+        threshold (float) optional: TODO (default 0.001)
+        subsample (float) optional: TODO (default 1.0)
 
     returns:
-        * (TODO): TODO
+        (TODO): TODO
     """
     if mask is None:
         mask = np.ones(pred.shape[:2]).astype(bool)
@@ -217,13 +217,13 @@ def get_scale(a, b, mask=None, subsample=1.0):
     """TODO DESCRIPTION
 
     params:
-        * a (TODO): TODO
-        * b (TODO): TODO
-        * mask (TODO) optional: TODO (default None)
-        * subsample (float) optional: TODO (default 1.0)
+        a (TODO): TODO
+        b (TODO): TODO
+        mask (TODO) optional: TODO (default None)
+        subsample (float) optional: TODO (default 1.0)
 
     returns:
-        * scale (TODO): TODO
+        scale (TODO): TODO
     """
     if mask is None:
         mask = np.ones(pred.shape[:2])
@@ -247,11 +247,11 @@ def get_brightness(rgb, mode='numpy'):
     """TODO DESCRIPTION
 
     params:
-        * rgb (TODO): TODO
-        * mode (str) optional: TODO (default "numpy")
+        rgb (TODO): TODO
+        mode (str) optional: TODO (default "numpy")
 
     returns:
-        * brightness (TODO): TODO
+        brightness (TODO): TODO
     """
     # "CCIR601 YIQ" method for computing brightness
     if mode == 'numpy':
@@ -266,10 +266,10 @@ def minmax(img):
     """TODO DESCRIPTION
 
     params:
-        * img (TODO): TODO
+        img (TODO): TODO
 
     returns:
-        * img (TODO): TODO
+        img (TODO): TODO
     """
     return (img - img.min()) / img.max()
 
@@ -278,10 +278,10 @@ def inv_2_real(inv_shd):
     """TODO DESCRIPTION
 
     params:
-        * inv_shd (TODO): TODO
+        inv_shd (TODO): TODO
 
     returns:
-        * shd (TODO): TODO
+        shd (TODO): TODO
     """
     # first normalize the network inverse shading to be [0,1]
     norm_inv_shd = minmax(inv_shd)
@@ -296,10 +296,10 @@ def round_32(x):
     """Round a number up to the next multiple of 32.
 
     params:
-        * x (numeric): a number to round
+        x (numeric): a number to round
 
     returns:
-        * (int): x rounded up to the next multiple of 32
+        (int): x rounded up to the next multiple of 32
     """
     return 32 * math.ceil(x / 32)
 
@@ -308,10 +308,10 @@ def round_128(x):
     """Round a number up to the next multiple of 128.
 
     params:
-        * x (numeric): the number to round
+        x (numeric): the number to round
 
     returns:
-        * (int): x rounded up to the next multiple of 128
+        (int): x rounded up to the next multiple of 128
     """
     return 128 * math.ceil(x / 128)
 
@@ -321,10 +321,10 @@ def to2np(img):
     numpy image with dimensions (height, width, channel).
 
     params:
-        * img (torch.Tensor): a torch image with dimensions (c, h, w)
+        img (torch.Tensor): a torch image with dimensions (c, h, w)
 
     returns:
-        * img (numpy.array): the image converted to numpy (h, w, c)
+        img (numpy.array): the image converted to numpy (h, w, c)
     """
     return img.detach().cpu().permute(1, 2, 0).numpy()
 
@@ -333,11 +333,11 @@ def view_scale(img, p=100):
     """TODO DESCRIPTION
 
     params:
-        * img (TODO): TODO
-        * p (int) optional: TODO (default 100)
+        img (TODO): TODO
+        p (int) optional: TODO (default 100)
 
     returns:
-        * img (numpy.array): TODO
+        img (numpy.array): TODO
     """
     return (img / np.percentile(img, p)).clip(0, 1)
 
@@ -346,11 +346,11 @@ def view(img, p=100):
     """TODO DESCRIPTION
 
     params:
-        * img (TODO): TODO
-        * p (int) optional: TODO (default 100)
+        img (TODO): TODO
+        p (int) optional: TODO (default 100)
 
     returns:
-        * img (TODO): TODO
+        img (TODO): TODO
     """
     return view_scale(img ** (1/2.2), p=p)
 
@@ -359,10 +359,10 @@ def invert(x):
     """TODO DESCRIPTION
 
     params:
-        * x (TODO): TODO
+        x (TODO): TODO
 
     returns:
-        * out (TODO): TODO
+        out (TODO): TODO
     """
     out = 1.0 / (x + 1.0)
     return out
@@ -372,12 +372,12 @@ def uninvert(x, eps=0.001, clip=True):
     """TODO DESCRIPTION
 
     params:
-        * x (TODO): TODO
-        * eps (float) optional: TODO (default 0.001)
-        * clip (bool) optional: TODO (default True)
+        x (TODO): TODO
+        eps (float) optional: TODO (default 0.001)
+        clip (bool) optional: TODO (default True)
 
     returns:
-        * out (TODO): TODO
+        out (TODO): TODO
     """
     if clip:
         x = x.clip(eps, 1.0)
@@ -390,11 +390,11 @@ def get_tonemap_scale(rgb_color, p=90):
     """TODO DESCRIPTION
 
     params:
-        * rgb_color (TODO): TODO
-        * p (int) optional: TODO (default 90)
+        rgb_color (TODO): TODO
+        p (int) optional: TODO (default 90)
 
     returns:
-        * scale (TODO): TODO
+        scale (TODO): TODO
     """
     gamma                             = 1.0 / 2.2   # standard gamma correction exponent
     inv_gamma                         = 1.0 / gamma

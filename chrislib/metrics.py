@@ -9,14 +9,14 @@ def weighted_human_disagreement_rate(pred, gt, mask, total_points=10000, indices
     """TODO DESCRIPTION
 
     params:
-        * pred (TODO): TODO
-        * gt (TODO): TODO
-        * mask (TODO): TODO
-        * total_pooints (int) optional: TODO (default 10000)
-        * indices (TODO) optional: TODO (default None)
+        pred (TODO): TODO
+        gt (TODO): TODO
+        mask (TODO): TODO
+        total_pooints (int) optional: TODO (default 10000)
+        indices (TODO) optional: TODO (default None)
 
     returns:
-        * err (TODO): TODO
+        err (TODO): TODO
     """
     # https://github.com/aim-uofa/AdelaiDepth/issues/26#issuecomment-1047483512
     if indices is None:
@@ -50,12 +50,12 @@ def select_index(gt_depth, mask, select_size=10000):
     """TODO DESCRIPTION
 
     params:
-        * gt_depth (TODO): TODO
-        * mask (TODO): TODO
-        * select_size (int) optional: TODO (default 10000)
+        gt_depth (TODO): TODO
+        mask (TODO): TODO
+        select_size (int) optional: TODO (default 10000)
 
     returns:
-        * p12_index (TODO): TODO
+        p12_index (TODO): TODO
     """
     valid_size = mask.sum()
     try:
@@ -74,12 +74,12 @@ def rmse_error(pred: np.ndarray, target: np.ndarray, mask:np.ndarray=None) -> fl
     """Root Mean Squared Error.
 
     params: 
-        * pred (np.ndarray): predicted values with dimension (H, W)
-        * target (np.ndarray): target values with dimension (H, W)
-        * mask (np.ndarray) optional: mask for the values with dimension (H, W) (default None)
+        pred (np.ndarray): predicted values with dimension (H, W)
+        target (np.ndarray): target values with dimension (H, W)
+        mask (np.ndarray) optional: mask for the values with dimension (H, W) (default None)
 
     returns:
-        * error (float): RMSE
+        error (float): RMSE
     """
     
     mask = mask if mask is not None else np.ones_like(pred)
@@ -97,12 +97,12 @@ def absolute_relative_error(pred: np.ndarray, target: np.ndarray, mask:np.ndarra
     """Absolute Relative Error.
 
     params: 
-        * pred (np.ndarray): predicted values with dimension (H, W)
-        * target (np.ndarray): target values with dimension (H, W)
-        * mask (np.ndarray) optional: mask for the values with dimension (H, W) (default None)
+        pred (np.ndarray): predicted values with dimension (H, W)
+        target (np.ndarray): target values with dimension (H, W)
+        mask (np.ndarray) optional: mask for the values with dimension (H, W) (default None)
 
     returns:
-        * error (float): ARE
+        error (float): ARE
     """
     
     mask = mask if mask is not None else np.ones_like(pred)
@@ -120,12 +120,12 @@ def delta_error(pred: np.ndarray, target: np.ndarray, mask:np.ndarray=None):
     """Delta Error: https://github.com/YvanYin/DiverseDepth/blob/master/Train/lib/utils/evaluate_depth_error.py#L132
 
     params: 
-        * pred (np.ndarray): predicted values with dimension (H, W)
-        * target (np.ndarray): target values with dimension (H, W)
-        * mask (np.ndarray) optional: mask for the values with dimension (H, W) (default None)
+        pred (np.ndarray): predicted values with dimension (H, W)
+        target (np.ndarray): target values with dimension (H, W)
+        mask (np.ndarray) optional: mask for the values with dimension (H, W) (default None)
 
     returns:
-        * perc (float): TODO
+        perc (float): TODO
     """
     pred = pred[mask]
     target = target[mask]
@@ -144,12 +144,12 @@ def ssq_error(correct, estimate, mask):
     """Compute the sum-squared-error for an image, where the estimate is multiplied by a scalar which minimizes the error. Sums over all pixels where mask is True. If the inputs are color, each color channel can be rescaled independently.
 
     params:
-        * correct (TODO): TODO
-        * estimate (TODO): TODO
-        * mask (TODO): TODO
+        correct (TODO): TODO
+        estimate (TODO): TODO
+        mask (TODO): TODO
 
     returns:
-        * (float): TODO
+        (float): TODO
     """
     assert correct.ndim == 2
     if np.sum(estimate**2 * mask) > 1e-5:
@@ -163,14 +163,14 @@ def lmse(correct, estimate, mask, window_size, window_shift):
     """TODO DESCRIPTION
 
     params:
-        * correct (TODO): TODO
-        * estimate (TODO): TODO
-        * mask (TODO): TODO
-        * window_size (TODO): TODO
-        * window_shift (TODO): TODO
+        correct (TODO): TODO
+        estimate (TODO): TODO
+        mask (TODO): TODO
+        window_size (TODO): TODO
+        window_shift (TODO): TODO
 
     returns:
-        * (TODO): TODO
+        (TODO): TODO
     """
     if len(correct.shape) == 2 or correct.shape[-1] == 1:
         return lmse_gray(correct, estimate, mask, window_size, window_shift)
@@ -182,14 +182,14 @@ def lmse_rgb(correct, estimate, mask, window_size, window_shift):
     """Returns the sum of the local sum-squared-errors, where the estimate may be rescaled within each local region to minimize the error. The windows are window_size x window_size, and they are spaced by window_shift.
 
     params:
-        * correct (TODO): TODO
-        * estimate (TODO): TODO
-        * mask (TODO): TODO
-        * window_size (TODO): TODO
-        * window_shift (TODO): TODO
+        correct (TODO): TODO
+        estimate (TODO): TODO
+        mask (TODO): TODO
+        window_size (TODO): TODO
+        window_shift (TODO): TODO
 
     returns:
-        * (float): TODO
+        (float): TODO
     """
     M, N = correct.shape[:2]
     ssq = total = 0.
@@ -221,14 +221,14 @@ def lmse_gray(correct, estimate, mask, window_size, window_shift):
     """Returns the sum of the local sum-squared-errors, where the estimate may be rescaled within each local region to minimize the error. The windows are window_size x window_size, and they are spaced by window_shift.
 
     params:
-        * correct (TODO): TODO
-        * estimate (TODO): TODO
-        * mask (TODO): TODO
-        * window_size (TODO): TODO
-        * window_shift (TODO): TODO
+        correct (TODO): TODO
+        estimate (TODO): TODO
+        mask (TODO): TODO
+        window_size (TODO): TODO
+        window_shift (TODO): TODO
 
     returns:
-        * (TODO): TODO
+        (TODO): TODO
     """
     M, N = correct.shape[:2]
     ssq = total = 0.
@@ -255,15 +255,15 @@ def lmse_downscale(correct, estimate, mask, window_size, window_shift, downscale
     """Returns the sum of the local sum-squared-errors, where the estimate may be rescaled within each local region to minimize the error. The windows are window_size x window_size, and they are spaced by window_shift.
 
     params:
-        * correct (TODO): TODO
-        * estimate (TODO): TODO
-        * mask (TODO): TODO
-        * window_size (TODO): TODO
-        * window_shift (TODO): TODO
-        * downscale (TODO): TODO
+        correct (TODO): TODO
+        estimate (TODO): TODO
+        mask (TODO): TODO
+        window_size (TODO): TODO
+        window_shift (TODO): TODO
+        downscale (TODO): TODO
 
     returns:
-        * (TODO): TODO
+        (TODO): TODO
     """
     M, N = correct.shape[:2]
     ssq = total = 0.
@@ -297,10 +297,10 @@ def compute_grad(img):
     """TODO DESCRIPTION
 
     params:
-        * img (TODO): TODO
+        img (TODO): TODO
 
     returns:
-        * (TODO): TODO
+        (TODO): TODO
     """
     # img = gaussian_filter(img, 0.5)
     # show(img)
@@ -313,13 +313,13 @@ def ssq_grad_error(correct, estimate, mask):
     """TODO DESCRIPTION
 
     params:
-        * correct (TODO): TODO
-        * estimate (TODO): TODO
-        * mask (TODO): TODO
+        correct (TODO): TODO
+        estimate (TODO): TODO
+        mask (TODO): TODO
 
     returns:
-        * (TODO): TODO
-        * cor_grad_mag (TODO): TODO
+        (TODO): TODO
+        cor_grad_mag (TODO): TODO
     """
     assert correct.ndim == 2
     
@@ -342,14 +342,14 @@ def grad_lmse(correct, estimate, mask, window_size, window_shift):
     """Returns the sum of the local sum-squared-errors, where the estimate may be rescaled within each local region to minimize the error. The windows are window_size x window_size, and they are spaced by window_shift.
 
     params:
-        * correct (TODO): TODO
-        * estimate (TODO): TODO
-        * mask (TODO): TODO
-        * window_size (TODO): TODO
-        * window_shift (TODO): TODO
+        correct (TODO): TODO
+        estimate (TODO): TODO
+        mask (TODO): TODO
+        window_size (TODO): TODO
+        window_shift (TODO): TODO
 
     returns:
-        * (TODO): TODO
+        (TODO): TODO
     """
     M, N = correct.shape[:2]
     ssq = total = 0.
@@ -382,14 +382,14 @@ def run_slic(gtdisp, nsamples, compactness=1):
     """TODO DESCRIPTION
 
     params:
-        * gtdisp (TODO): TODO
-        * nsamples (TODO): TODO
-        * compactness (int) optional: TODO (default 1)
+        gtdisp (TODO): TODO
+        nsamples (TODO): TODO
+        compactness (int) optional: TODO (default 1)
 
     returns:
-        * centers (TODO): TODO
-        * point_pairs (TODO): TODO
-        * seg_img (TODO): TODO
+        centers (TODO): TODO
+        point_pairs (TODO): TODO
+        seg_img (TODO): TODO
     """
     segments = slic(gtdisp, n_segments=nsamples, compactness=compactness, start_label=0, slic_zero=True)
 
@@ -415,13 +415,13 @@ def fast_ordering_ratio(base, point_loc1, point_loc2, threshold):
     """TODO DESCRIPTION
 
     params:
-        * base (TODO): TODO
-        * point_loc1 (TODO): TODO
-        * point_loc2 (TODO): TODO
-        * threshold (TODO): TODO
+        base (TODO): TODO
+        point_loc1 (TODO): TODO
+        point_loc2 (TODO): TODO
+        threshold (TODO): TODO
 
     returns:
-        * out (TODO): TODO
+        out (TODO): TODO
     """
     ratio = base[point_loc1[:, 0], point_loc1[:, 1]] / base[point_loc2[:, 0], point_loc2[:, 1]]
 
@@ -436,13 +436,13 @@ def fast_ordering_diff(base, point_loc1, point_loc2, threshold):
     """TODO DESCRIPTION
 
     params:
-        * base (TODO): TODO
-        * point_loc1 (TODO): TODO
-        * point_loc2 (TODO): TODO
-        * threshold (TODO): TODO
+        base (TODO): TODO
+        point_loc1 (TODO): TODO
+        point_loc2 (TODO): TODO
+        threshold (TODO): TODO
 
     returns:
-        * out (TODO): TODO
+        out (TODO): TODO
     """
     diff = base[point_loc1[:, 0], point_loc1[:, 1]] - base[point_loc2[:, 0], point_loc2[:, 1]]
 
@@ -457,14 +457,14 @@ def fast_ordering(base, point_loc1, point_loc2, threshold, mode):
     """TODO DESCRIPTION
 
     params:
-        * base (TODO): TODO
-        * point_loc1 (TODO): TODO
-        * point_loc2 (TODO): TODO
-        * threshold (TODO): TODO
-        * mode (TODO): TODO
+        base (TODO): TODO
+        point_loc1 (TODO): TODO
+        point_loc2 (TODO): TODO
+        threshold (TODO): TODO
+        mode (TODO): TODO
 
     returns:
-        * (TODO): TODO
+        (TODO): TODO
     """
     if mode == 'ratio':
         return fast_ordering_ratio(base, point_loc1, point_loc2, threshold)
@@ -476,19 +476,19 @@ def fast_d3r(pred, target, freq_threshold, threshold, nsamples, mode='diff', deb
     """Compute D3R metric using diff instead of ratio to compute the ordinal relations.
 
     params:
-        * pred ([torch array]): Prediction disparity map between 0,1 not containing Nan values
-        * target ([torch array]): Ground truth disparity map between 0,1 not containing Nan values
-        * freq_threshold ([float]): A threshold to define high frequecy changes
-        * threshold ([float]): Threshold to define ordinal relations based on diff
-        * nsamples ([int]): Number of superpixels created by SLIC alghorithm
-        * mode (str) optional: TODO (default "diff")
-        * debug (bool) optional: whether to debug (default False)
-        * mask (TODO) optional: TODO (default None)
-        * compactness (float) optional: TODO (default 1.0)
-        * slic (TODO) optional: TODO (default None)
+        pred ([torch array]): Prediction disparity map between 0,1 not containing Nan values
+        target ([torch array]): Ground truth disparity map between 0,1 not containing Nan values
+        freq_threshold ([float]): A threshold to define high frequecy changes
+        threshold ([float]): Threshold to define ordinal relations based on diff
+        nsamples ([int]): Number of superpixels created by SLIC alghorithm
+        mode (str) optional: TODO (default "diff")
+        debug (bool) optional: whether to debug (default False)
+        mask (TODO) optional: TODO (default None)
+        compactness (float) optional: TODO (default 1.0)
+        slic (TODO) optional: TODO (default None)
 
     returns:
-        * (list of [float, list of tuples, list of tuples, 2darray]: computed error value, list of selected point pairs, list of point pairs that had mismatching orders, position of centers of superpixels
+        (list of [float, list of tuples, list of tuples, 2darray]): computed error value, list of selected point pairs, list of point pairs that had mismatching orders, position of centers of superpixels
     """
     gtdisp = target
     preddisp = pred
@@ -550,12 +550,12 @@ def compute_whdr(reflectance, judgements, delta=0.10):
     NOTE (chris): I stripped this directly from the file that is provided as part of the IIW dataset.
 
     params:
-        * reflectance (np.ndarray): the linear RGB reflectance image.
-        * judgements (dict): a JSON object loaded from the Intrinsic Images in the Wild dataset
-        * delta (TODO): the threshold where humans switch from saying "about the same" to "one point is darker"
+        reflectance (np.ndarray): the linear RGB reflectance image.
+        judgements (dict): a JSON object loaded from the Intrinsic Images in the Wild dataset
+        delta (TODO): the threshold where humans switch from saying "about the same" to "one point is darker"
 
     returns:
-        * (TODO): TODO
+        (TODO): TODO
     """
     points = judgements['intrinsic_points']
     comparisons = judgements['intrinsic_comparisons']

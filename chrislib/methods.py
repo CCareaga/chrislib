@@ -15,10 +15,10 @@ def luo_resize(srgb_img):
     """TODO DESCRIPTION
 
     params:
-        * srgb_img (TODO): TODO
+        srgb_img (TODO): TODO
 
     returns:
-        * srgb_img (TODO): TODO
+        srgb_img (TODO): TODO
     """
     ratio = float(srgb_img.shape[0])/float(srgb_img.shape[1]) 
  
@@ -47,10 +47,10 @@ def rgb_to_srgb(rgb):
     """TODO DESCRIPTION
 
     params:
-        * rgb (TODO): TODO
+        rgb (TODO): TODO
 
     returns:
-        * ret (TODO): TODO
+        ret (TODO): TODO
     """
     ret = np.zeros_like(rgb)
     idx0 = rgb <= 0.0031308
@@ -64,10 +64,10 @@ def srgb_to_rgb(srgb):
     """TODO DESCRIPTION
 
     params:
-        * srgb (TODO): TODO
+        srgb (TODO): TODO
 
     returns:
-        * ret (TODO): TODO
+        ret (TODO): TODO
     """
     ret = np.zeros_like(srgb)
     idx0 = srgb <= 0.04045
@@ -81,16 +81,16 @@ def run_li_2018_eccv(img, orig_resize=False, linear_input=False, linear_output=F
     """TODO DESCRIPTION
 
     params:
-        * img (TODO): TODO
-        * orig_resize (bool) optional: whether to resize img (default False)
-        * linear_input (bool) optional: TODO (default False)
-        * linear_output (bool) optional: TODO (default False)
-        * verbose (bool) optional: whether to use verbose logging (default False)
+        img (TODO): TODO
+        orig_resize (bool) optional: whether to resize img (default False)
+        linear_input (bool) optional: TODO (default False)
+        linear_output (bool) optional: TODO (default False)
+        verbose (bool) optional: whether to use verbose logging (default False)
 
     returns:
-        * alb (TODO): TODO
-        * shd (TODO): TODO
-        * rec (TODO): TODO
+        alb (TODO): TODO
+        shd (TODO): TODO
+        rec (TODO): TODO
     """
     root_dir = f'{COMPARISONS_DIR}/li_2018_eccv/'
 
@@ -140,16 +140,16 @@ def run_li_2018_cvpr(img, orig_resize=False, linear_input=False, linear_output=F
     """TODO DESCRIPTION
 
     params:
-        * img (TODO): TODO
-        * orig_resize (bool) optional: whether to resize img (default False)
-        * linear_input (bool) optional: TODO (default False)
-        * linear_output (bool) optional: TODO (default False)
-        * verbose (bool) optional: whether to use verbose logging (default False)
+        img (TODO): TODO
+        orig_resize (bool) optional: whether to resize img (default False)
+        linear_input (bool) optional: TODO (default False)
+        linear_output (bool) optional: TODO (default False)
+        verbose (bool) optional: whether to use verbose logging (default False)
 
     returns:
-        * alb (TODO): TODO
-        * shd (TODO): TODO
-        * rec (TODO): TODO
+        alb (TODO): TODO
+        shd (TODO): TODO
+        rec (TODO): TODO
     """
     root_dir = f'{COMPARISONS_DIR}/li_2018_cvpr/'
 
@@ -198,16 +198,16 @@ def run_luo_2020(img, orig_resize=False, linear_input=False, linear_output=False
     """TODO DESCRIPTION
 
     params:
-        * img (TODO): TODO
-        * orig_resize (bool) optional: whether to resize img (default False)
-        * linear_input (bool) optional: TODO (default False)
-        * linear_output (bool) optional: TODO (default False)
-        * verbose (bool) optional: whether to use verbose logging (default False)
+        img (TODO): TODO
+        orig_resize (bool) optional: whether to resize img (default False)
+        linear_input (bool) optional: TODO (default False)
+        linear_output (bool) optional: TODO (default False)
+        verbose (bool) optional: whether to use verbose logging (default False)
 
     returns:
-        * alb (TODO): TODO
-        * shd (TODO): TODO
-        * rec (TODO): TODO
+        alb (TODO): TODO
+        shd (TODO): TODO
+        rec (TODO): TODO
     """
     sys.path.append(f'{COMPARISONS_DIR}/')
 
@@ -282,16 +282,16 @@ def run_liu_2020(img, orig_resize=False, linear_input=False, linear_output=False
     """TODO DESCRIPTION
 
     params:
-        * img (TODO): TODO
-        * orig_resize (bool) optional: whether to resize img (default False)
-        * linear_input (bool) optional: TODO (default False)
-        * linear_output (bool) optional: TODO (default False)
-        * verbose (bool) optional: whether to use verbose logging (default False)
+        img (TODO): TODO
+        orig_resize (bool) optional: whether to resize img (default False)
+        linear_input (bool) optional: TODO (default False)
+        linear_output (bool) optional: TODO (default False)
+        verbose (bool) optional: whether to use verbose logging (default False)
 
     returns:
-        * alb (TODO): TODO
-        * shd (TODO): TODO
-        * rec (TODO): TODO
+        alb (TODO): TODO
+        shd (TODO): TODO
+        rec (TODO): TODO
     """
     root_dir = f'{COMPARISONS_DIR}/liu_2020/'
 
@@ -336,16 +336,16 @@ def run_vanhoey_2018(img, orig_resize=False, linear_input=False, linear_output=F
     """TODO DESCRIPTION
 
     params:
-        * img (TODO): TODO
-        * orig_resize (bool) optional: whether to resize img (default False)
-        * linear_input (bool) optional: TODO (default False)
-        * linear_output (bool) optional: TODO (default False)
-        * verbose (bool) optional: whether to use verbose logging (default False)
+        img (TODO): TODO
+        orig_resize (bool) optional: whether to resize img (default False)
+        linear_input (bool) optional: TODO (default False)
+        linear_output (bool) optional: TODO (default False)
+        verbose (bool) optional: whether to use verbose logging (default False)
 
     returns:
-        * alb (TODO): TODO
-        * shd (TODO): TODO
-        * rec (TODO): TODO
+        alb (TODO): TODO
+        shd (TODO): TODO
+        rec (TODO): TODO
     """
     root_dir = f'{COMPARISONS_DIR}/vanhoey_2018/'
 
@@ -385,16 +385,16 @@ def run_baslamisli_2018_eccv(img, orig_resize=False, linear_input=False, linear_
     """TODO DESCRIPTION
 
     params:
-        * img (TODO): TODO
-        * orig_resize (bool) optional: whether to resize img (default False)
-        * linear_input (bool) optional: TODO (default False)
-        * linear_output (bool) optional: TODO (default False)
-        * verbose (bool) optional: whether to use verbose logging (default False)
+        img (TODO): TODO
+        orig_resize (bool) optional: whether to resize img (default False)
+        linear_input (bool) optional: TODO (default False)
+        linear_output (bool) optional: TODO (default False)
+        verbose (bool) optional: whether to use verbose logging (default False)
 
     returns:
-        * alb (TODO): TODO
-        * shd (TODO): TODO
-        * rec (TODO): TODO
+        alb (TODO): TODO
+        shd (TODO): TODO
+        rec (TODO): TODO
     """
     root_dir = f'{COMPARISONS_DIR}/baslamisli_2018_eccv/'
 
@@ -443,17 +443,17 @@ def run_das_2022(img, orig_resize=False, linear_input=False, linear_output=False
     """TODO DESCRIPTION
 
     params:
-        * img (TODO): TODO
-        * orig_resize (bool) optional: whether to resize img (default False)
-        * linear_input (bool) optional: TODO (default False)
-        * linear_output (bool) optional: TODO (default False)
-        * verbose (bool) optional: whether to use verbose logging (default False)
-        * gpu (bool) optional: whether to use GPU (default True)
+        img (TODO): TODO
+        orig_resize (bool) optional: whether to resize img (default False)
+        linear_input (bool) optional: TODO (default False)
+        linear_output (bool) optional: TODO (default False)
+        verbose (bool) optional: whether to use verbose logging (default False)
+        gpu (bool) optional: whether to use GPU (default True)
 
     returns:
-        * alb (TODO): TODO
-        * shd (TODO): TODO
-        * rec (TODO): TODO
+        alb (TODO): TODO
+        shd (TODO): TODO
+        rec (TODO): TODO
     """
     root_dir = f'{COMPARISONS_DIR}/das_2022/'
 
@@ -505,16 +505,16 @@ def run_baslamisli_2018_cvpr(img, orig_resize=False, linear_input=False, linear_
     """TODO DESCRIPTION
 
     params:
-        * img (TODO): TODO
-        * orig_resize (bool) optional: whether to resize img (default False)
-        * linear_input (bool) optional: TODO (default False)
-        * linear_output (bool) optional: TODO (default False)
-        * verbose (bool) optional: whether to use verbose logging (default False)
+        img (TODO): TODO
+        orig_resize (bool) optional: whether to resize img (default False)
+        linear_input (bool) optional: TODO (default False)
+        linear_output (bool) optional: TODO (default False)
+        verbose (bool) optional: whether to use verbose logging (default False)
 
     returns:
-        * alb (TODO): TODO
-        * shd (TODO): TODO
-        * rec (TODO): TODO
+        alb (TODO): TODO
+        shd (TODO): TODO
+        rec (TODO): TODO
     """
     # NOTE (chris): for this method we always use the orig_resize code because
     # the model can't accept any size input only the specific original size
@@ -557,16 +557,16 @@ def run_shen_2011(img, orig_resize=False, linear_input=False, linear_output=Fals
     """TODO DESCRIPTION
 
     params:
-        * img (TODO): TODO
-        * orig_resize (bool) optional: whether to resize img (default False)
-        * linear_input (bool) optional: TODO (default False)
-        * linear_output (bool) optional: TODO (default False)
-        * verbose (bool) optional: whether to use verbose logging (default False)
+        img (TODO): TODO
+        orig_resize (bool) optional: whether to resize img (default False)
+        linear_input (bool) optional: TODO (default False)
+        linear_output (bool) optional: TODO (default False)
+        verbose (bool) optional: whether to use verbose logging (default False)
 
     returns:
-        * alb (TODO): TODO
-        * shd (TODO): TODO
-        * rec (TODO): TODO
+        alb (TODO): TODO
+        shd (TODO): TODO
+        rec (TODO): TODO
     """
     root_dir = f'{COMPARISONS_DIR}/shen_2011/'
 
@@ -600,16 +600,16 @@ def run_bell_2014(img, orig_resize=False, linear_input=False, linear_output=Fals
     """TODO DESCRIPTION
 
     params:
-        * img (TODO): TODO
-        * orig_resize (bool) optional: whether to resize img (default False)
-        * linear_input (bool) optional: TODO (default False)
-        * linear_output (bool) optional: TODO (default False)
-        * verbose (bool) optional: whether to use verbose logging (default False)
+        img (TODO): TODO
+        orig_resize (bool) optional: whether to resize img (default False)
+        linear_input (bool) optional: TODO (default False)
+        linear_output (bool) optional: TODO (default False)
+        verbose (bool) optional: whether to use verbose logging (default False)
 
     returns:
-        * alb (TODO): TODO
-        * shd (TODO): TODO
-        * rec (TODO): TODO
+        alb (TODO): TODO
+        shd (TODO): TODO
+        rec (TODO): TODO
     """
     root_dir = f'{COMPARISONS_DIR}/bell_2014/'
     

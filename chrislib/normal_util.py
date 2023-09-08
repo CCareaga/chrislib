@@ -10,10 +10,10 @@ def load_omni_model(omni_dir):
     """TODO DESCRIPTION
 
     params:
-        * omni_dir (str): TODO
+        omni_dir (str): TODO
 
     returns:
-        * model (TODO): TODO
+        model (TODO): TODO
     """
     sys.path.append(omni_dir)
 
@@ -45,12 +45,12 @@ def get_omni_normals(model, img, zero_one=True):
     """TODO DESCRIPTION
 
     params:
-        * model (TODO): TODO
-        * img (TODO): TODO
-        * zero_one (bool) optional: TODO (default True)
+        model (TODO): TODO
+        img (TODO): TODO
+        zero_one (bool) optional: TODO (default True)
 
     returns:
-        * np_out (TODO): TODO
+        np_out (TODO): TODO
     """
     h, w, _ = img.shape
 
@@ -79,10 +79,10 @@ def prediction_to_normal(pred):
     """TODO DESCRIPTION
 
     params:
-        * pred (TODO): TODO
+        pred (TODO): TODO
 
     returns:
-        * (TODO): TODO
+        (TODO): TODO
     """
     # x, y = pred[:, 0, :, :], pred[:, 1, :, :]
     # z = torch.sqrt((1.0 - (x**2 + y**2)).clip(1e-4))
@@ -104,12 +104,12 @@ def angular_error(gt, pred, mask):
     """TODO DESCRIPTION
 
     params:
-        * gt (TODO): TODO
-        * pred (TODO): TODO
-        * mask (TODO): TODO
+        gt (TODO): TODO
+        pred (TODO): TODO
+        mask (TODO): TODO
 
     returns:
-        * (TODO): TODO
+        (TODO): TODO
     """
     gt = gt.astype(np.float64) 
     pred = pred.astype(np.float64) 
@@ -133,15 +133,15 @@ def compute_metrics(ang_err):
     """Six surface normal metrics following: https://web.eecs.umich.edu/~fouhey/2016/evalSN/evalSN.html
 
     params:
-        * ang_err (TODO): TODO
+        ang_err (TODO): TODO
 
     returns:
-        * mean_err (TODO): TODO
-        * med_err (TODO): TODO
-        * rmse (TODO): TODO
-        * t1 (TODO): TODO
-        * t2 (TODO): TODO
-        * t3 (TODO): TODO
+        mean_err (TODO): TODO
+        med_err (TODO): TODO
+        rmse (TODO): TODO
+        t1 (TODO): TODO
+        t2 (TODO): TODO
+        t3 (TODO): TODO
     """
     mean_err = np.mean(ang_err)
     med_err = np.median(ang_err)
@@ -158,12 +158,12 @@ def depth_to_normals(depth, k=7, perc=90):
     """TODO DESCRIPTION
 
     params:
-        * depth (np.array): input depth
-        * k (int) optional: sobel kernel size for depth gradient computation (default 7)
-        * perc (int): percentile used to clip outliers in gradient magnitude (default 90)
+        depth (np.array): input depth
+        k (int) optional: sobel kernel size for depth gradient computation (default 7)
+        perc (int): percentile used to clip outliers in gradient magnitude (default 90)
 
     returns:
-        * normal (TODO): TODO
+        normal (TODO): TODO
     """
     h, w = depth.shape
     

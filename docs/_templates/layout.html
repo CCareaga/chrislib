@@ -1,0 +1,48 @@
+{% extends "!layout.html" %}
+
+{%- block footer %}
+<script type="text/javascript">
+	/* This javascript edits the formatting of return values that have no variable name. We have set Sphinx to generate documentation for params and return values
+	   with the same format:
+		<strong>var_name</strong> (<em>var_type</em>) - description_text
+	   With this format, the var_name, var_type, and description_text are all required. However, we want to properly format return values that have no variable
+	   name. This means that when there is no variable name, we don't want the first word to be <strong> but rather we want to start with the (<em>var_type</em>).
+	   In this function we do that as follows:
+		* check if the first character after "<strong>" is a "(" (if not, then this is already properly formatted and we don't do anything else)
+		* get rid of the "<strong>"and "</strong>" substrings from the line
+		* add "<em>" and "</em>" tags inside the first set of parentheses
+		* concatenate the rest of the original line (it is just normal text) to the fixed first word (which should be the return type)
+		* replace the innerHTML with that fixed string
+	*/
+	// get all objects that contain param or return lists
+	var eles = document.getElementsByClassName("field-list");
+
+	Array.prototype.forEach.call(eles, function(el) {
+		// each param or return value is in a <p> object.
+		// we expect that the only <p> objects in each "field-list" object contain param or return descriptions.
+		var ps = el.getElementsByTagName("p");
+
+		Array.prototype.forEach.call(ps, function(pp) {
+			// split the content (as string) of the <p> object on spaces (we expect the first word to either be the var name or var type,
+			// depending if it is a normal param/return declaration or a return without a variable name
+			const ppEles = pp.innerHTML.split(" ");
+
+			// check first text character is a "(" (meaning the content in the <p> object is for a return declaration with no variable name)
+			// if so, we need to change the content of the <p> object
+			if (ppEles[0].substring("<strong>".length).startsWith("(")) {
+				// get rid of the bold tags - those are only used for variable names and we have established there is no variable name in this line
+				// this will convert the line from "<strong>(var_type)</strong> - description_text" to "(var_type) - description_text"
+				var newHTML = pp.innerHTML.replace("<strong>", "").replace("</strong>", "")
+
+				// add the "<em>" tag that is used on variable types and reassemble the return declaration.
+				// this will convert the line from "(var_type) - description_text" to "(<em>var_type</em>) - description_text"
+				newHTML = newHTML[0] + "<em>" + newHTML.slice(1, newHTML.indexOf(")")) + "</em>" + newHTML.slice(newHTML.indexOf(")"), newHTML.length);
+
+				// set the reconstructed value to the innerHTML of the paragraph object
+				pp.innerHTML = newHTML
+			}
+		});
+	});
+</script>           
+{% endblock %}
+
