@@ -2,6 +2,7 @@
 
 #### to install
 * create a python3 virtualenv (`python3 -m venv venv`) and start it (`source venv/bin/activate`)
+* install chrislib dependencies with `pip install -r requirements.txt`
 * run `python setup.py install` (or `python setup.py develop` for developer mode) to install chrislib as a library
 
 #### to set up documentation
