@@ -10,7 +10,7 @@
 * run tests:
     * to run all tests in the "tests" directory, simply run the command `pytest tests`
     * to run all tests in one file, e.g. "filename.py," run `pytest tests/filename.py`
-    * to only run tests whose names match a string, e.g. "test_loss," run `pytest -k test_loss``
+    * to only run tests whose names match a string, e.g. "test_loss," run `pytest -k test_loss`
 
 #### to set up documentation
 ###### from scratch
