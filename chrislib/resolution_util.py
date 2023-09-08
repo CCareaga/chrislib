@@ -2,7 +2,7 @@ import skimage
 import cv2
 import numpy as np
 
-from general import round_32
+from chrislib.general import round_32
 
 
 def resizewithpool(img, size):

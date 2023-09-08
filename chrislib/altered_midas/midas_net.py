@@ -87,8 +87,9 @@ class MidasNet(BaseModel):
         path_1 = self.scratch.refinenet1(path_2, layer_1_rn)
 
         out = self.scratch.output_conv(path_1)
-
-        if self.out_chan == 1:
-            return torch.squeeze(out, dim=1)
-        else:
-            return out
+        
+        return out
+        # if self.out_chan == 1:
+        #     return torch.squeeze(out, dim=1)
+        # else:
+        #     return out

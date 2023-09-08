@@ -3,18 +3,78 @@ import kornia.morphology as kn_morph
 import torchvision.transforms.functional as TF
 import torch
 
-
-def lp_loss(pred, grnd, mask, p=2):
-    """TODO DESCRIPTION
+def compute_scale_and_shift(prediction, target, mask):
+    """Computes the optimal scale and shift according to least-squares
+    criteria between the prediction and the target in the masked area
 
     params:
-        * pred (TODO): TODO
-        * grnd (TODO): TODO
-        * mask (TODO): TODO (must be B x 1 x H x W)
-        * p (int) optional: TODO (default 2)
+        * pred (torch.Tensor): network prediction tensor (B x H x W)
+        * grnd (torch.Tensor): ground truth tensor (B x H x W)
+        * mask (torch.Tensor): mask denoting valid pixels (must be B x H x W)
 
     returns:
-        * (TODO): TODO
+        * x_0 (torch.Tensor): scales (B)
+        * x_1 (torch.Tensor): shifts (B)
+    """
+    # system matrix: A = [[a_00, a_01], [a_10, a_11]]
+    a_00 = torch.sum(mask * prediction * prediction, (1, 2))
+    a_01 = torch.sum(mask * prediction, (1, 2))
+    a_11 = torch.sum(mask, (1, 2))
+
+    # right hand side: b = [b_0, b_1]
+    b_0 = torch.sum(mask * prediction * target, (1, 2))
+    b_1 = torch.sum(mask * target, (1, 2))
+
+    # solution: x = A^-1 . b = [[a_11, -a_01], [-a_10, a_00]] / (a_00 * a_11 -
+    # a_01 * a_10) . b
+    x_0 = torch.zeros_like(b_0)
+    x_1 = torch.zeros_like(b_1)
+
+    det = a_00 * a_11 - a_01 * a_01
+    valid = det.nonzero()
+
+    x_0[valid] = (a_11[valid] * b_0[valid] -
+                  a_01[valid] * b_1[valid]) / det[valid]
+    x_1[valid] = (-a_01[valid] * b_0[valid] +
+                  a_00[valid] * b_1[valid]) / det[valid]
+
+    return x_0, x_1
+
+def compute_ssi_pred(pred, grnd, mask):
+    """Returns the provided predictions shifted and scaled such that they 
+    minimize the L2 difference with the ground truth in the masked area
+
+    params:
+        * pred (torch.Tensor): network prediction tensor (B x H x W)
+        * grnd (torch.Tensor): ground truth tensor (B x H x W)
+        * mask (torch.Tensor): mask denoting valid pixels (must be B x H x W)
+
+    returns:
+        * (TODO): the network prediction optimally shifted and scaled
+    """
+    scale, shift = compute_scale_and_shift(pred, grnd, mask)
+
+    # NOTE: early in training this scale can be negative, so we can simply clip it 
+    # at zero. It could also probably just be set to one if less than 0, it's just
+    # to help stabilize early training until the network is making reasonable preds
+    scale = torch.nn.functional.relu(scale)
+    print(scale, shift)
+
+    return (pred * scale.view(-1, 1, 1)) + shift.view(-1, 1, 1)
+
+
+def lp_loss(pred, grnd, mask, p=2):
+    """Performs a regular LP loss where P is specified. Can be used to
+    compute both MSE (p=2) and L1 (p=1) loss functions
+
+    params:
+        * pred (torch.Tensor): network prediction tensor (B x C x H x W)
+        * grnd (torch.Tensor): ground truth tensor (B x C x H x W)
+        * mask (torch.Tensor): mask denoting valid pixels (must be B x 1 x H x W)
+        * p (int) optional: degree of L norm (default 2)
+
+    returns:
+        * (TODO): the mean LP loss between pixels in prediction and ground truth
     """
     if p == 1:
         lp_term = torch.nn.functional.l1_loss(pred, grnd, reduction='none') * mask
@@ -25,7 +85,7 @@ def lp_loss(pred, grnd, mask, p=2):
 
 
 class MSGLoss():
-    """TODO DESCRIPTION
+    """Multi-scale Gradient Loss implementation
 
     params:
         * scales (int) optional: TODO (default 4)
