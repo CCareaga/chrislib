@@ -18,7 +18,6 @@ Welcome to chrislib's documentation!
    methods
    metrics
    midas_loss
-   model_util
    normal_util
    ordinal_util
    pipeline
