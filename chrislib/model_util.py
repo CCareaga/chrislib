@@ -1,18 +1,14 @@
 import torch
-from chrislib.altered_midas.midas_net import MidasNet
-from chrislib.altered_midas.midas_net_custom import MidasNet_small
+from altered_midas.midas_net import MidasNet
+from altered_midas.midas_net_custom import MidasNet_small
 
 
-def load_models(
-    ord_path='/home/chris/research/intrinsic/boosted_shading/results/final_weights/vivid_bird_318_300.pt',
-    mrg_path='/home/chris/research/intrinsic/boosted_shading/results/final_weights/fluent_eon_138_200.pt',
-    device='cuda'
-):
+def load_models(ord_path, mrg_path, device='cuda'):
     """TODO DESCRIPTION
 
     params:
-        ord_path (str) optional: TODO (default path to vivid_bird_318_300.pt)
-        mrg_path (str) optional: TODO (default path to fluent_eon_138_200.pt)
+        ord_path (str): TODO
+        mrg_path (str): TODO
         device (str) optional: the device to run the model on (default "cuda")
 
     returns:
