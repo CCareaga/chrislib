@@ -9,6 +9,7 @@ docutils==0.20.1
 filelock==3.12.3
 fonttools==4.42.1
 fsspec==2023.9.0
+gdown==4.7.1
 huggingface-hub==0.16.4
 idna==3.4
 imageio==2.31.3
