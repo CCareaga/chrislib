@@ -56,4 +56,3 @@ tqdm==4.66.1
 typing_extensions==4.7.1
 urllib3==2.0.4
 zipp==3.16.2
-omnidata_tools @ git+https://github.com/CCareaga/omnidata@main

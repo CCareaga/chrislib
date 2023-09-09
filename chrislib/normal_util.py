@@ -1,42 +1,9 @@
-import os
-import gdown
 import torch
 import numpy as np
 import cv2
 from skimage.transform import resize
-from omnidata_tools.torch.modules.midas.dpt_depth import DPTDepthModel
 
 from chrislib.general import round_32
-
-OMNIDATA_NORMALS_WEIGHTS_URL = "https://drive.google.com/uc?id=1wNxVO4vVbDEMEpnAi_jwQObf2MFodcBR"
-OMNIDATA_NORMALS_WEIGHTS_PATH = "/tmp/omnidata_surface_normal_models/"
-
-
-def load_omni_model():
-    """TODO DESCRIPTION
-
-    returns:
-        model (TODO): TODO
-    """
-    # download weights
-    if not os.path.isdir(OMNIDATA_NORMALS_WEIGHTS_PATH):
-        os.mkdir(OMNIDATA_NORMALS_WEIGHTS_PATH)
-        gdown.download(url=OMNIDATA_NORMALS_WEIGHTS_URL, output=OMNIDATA_NORMALS_WEIGHTS_PATH)
-
-    model = DPTDepthModel(backbone='vitb_rn50_384', num_channels=3) # DPT Hybrid
-    checkpoint = torch.load(OMNIDATA_NORMALS_WEIGHTS_PATH, map_location='cuda')
-
-    if 'state_dict' in checkpoint:
-        state_dict = {}
-        for k, v in checkpoint['state_dict'].items():
-            state_dict[k[6:]] = v
-    else:
-        state_dict = checkpoint
-
-    model.load_state_dict(state_dict)
-    model.to('cuda')
-
-    return model
 
 
 def get_omni_normals(model, img, zero_one=True):

@@ -24,6 +24,6 @@
 * in your file browser, navigate to _build/html/index.html and double-click. This should open a browser with the HTML loaded.
 
 #### related packages
-* to use methods and classes from "altered_midas" (https://github.com/CCareaga/MiDaS), run `pip install https://github.com/CCareaga/MiDaS/archive/master.zip`
-* to use methods and classes from "omnidata_tools" (https://github.com/CCareaga/omnidata), run `pip install https://github.com/CCareaga/omnidata/archive/main.zip`
+* to use methods and classes from "altered_midas" (https://github.com/CCareaga/MiDaS), run `pip install https://github.com/CCareaga/MiDaS/archive/master.zip`. Add altered_midas to requirements.txt as this line: `altered_midas @ git+https://github.com/CCareaga/MiDaS@master`
+* to use methods and classes from "omnidata_tools" (https://github.com/CCareaga/omnidata), run `pip install https://github.com/CCareaga/omnidata/archive/main.zip`. Add omnidata_tools to requirements.txt as this line: `omnidata_tools @ git+https://github.com/CCareaga/omnidata@main`
 
