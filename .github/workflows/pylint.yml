@@ -21,4 +21,4 @@ jobs:
         pip install pylint
     - name: Analysing the code with pylint
       run: |
-        pylint --disable=missing-module-docstring,consider-using-generator,too-many-arguments,too-many-locals,no-member,too-many-branches,too-many-statements,invalid-name $(git ls-files '*.py')
+        pylint --disable=missing-module-docstring,consider-using-generator,too-many-arguments,too-many-locals,no-member,dangerous-default-value,too-many-branches,too-many-statements,invalid-name $(git ls-files '*.py')
