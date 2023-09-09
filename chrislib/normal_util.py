@@ -1,4 +1,5 @@
-import sys
+import os
+import gdown
 import torch
 import numpy as np
 import cv2
@@ -7,26 +8,25 @@ from omnidata_tools.torch.modules.midas.dpt_depth import DPTDepthModel
 
 from chrislib.general import round_32
 
+OMNIDATA_NORMALS_WEIGHTS_URL = "https://drive.google.com/uc?id=1wNxVO4vVbDEMEpnAi_jwQObf2MFodcBR"
+OMNIDATA_NORMALS_WEIGHTS_PATH = "/tmp/omnidata_surface_normal_models/"
 
 
-def load_omni_model(omni_dir):
+def load_omni_model():
     """TODO DESCRIPTION
-
-    params:
-        omni_dir (str): TODO
 
     returns:
         model (TODO): TODO
     """
-    sys.path.append(omni_dir)
-
-    omni_model_dir = f'{omni_dir}/omnidata_tools/torch/pretrained_models/'
+    # download weights
+    if not os.path.isdir(OMNIDATA_NORMALS_WEIGHTS_PATH):
+        os.mkdir(OMNIDATA_NORMALS_WEIGHTS_PATH)
+        gdown.download(url=OMNIDATA_NORMALS_WEIGHTS_URL, output=OMNIDATA_NORMALS_WEIGHTS_PATH)
 
     image_size = 384
 
-    pretrained_weights_path = omni_model_dir + 'omnidata_dpt_normal_v2.ckpt'
     model = DPTDepthModel(backbone='vitb_rn50_384', num_channels=3) # DPT Hybrid
-    checkpoint = torch.load(pretrained_weights_path, map_location='cuda')
+    checkpoint = torch.load(OMNIDATA_NORMALS_WEIGHTS_PATH, map_location='cuda')
 
     if 'state_dict' in checkpoint:
         state_dict = {}
