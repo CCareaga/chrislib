@@ -23,8 +23,6 @@ def load_omni_model():
         os.mkdir(OMNIDATA_NORMALS_WEIGHTS_PATH)
         gdown.download(url=OMNIDATA_NORMALS_WEIGHTS_URL, output=OMNIDATA_NORMALS_WEIGHTS_PATH)
 
-    image_size = 384
-
     model = DPTDepthModel(backbone='vitb_rn50_384', num_channels=3) # DPT Hybrid
     checkpoint = torch.load(OMNIDATA_NORMALS_WEIGHTS_PATH, map_location='cuda')
 
