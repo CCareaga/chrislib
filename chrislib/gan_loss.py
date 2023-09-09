@@ -18,6 +18,21 @@ def set_grad(nets, requires_grad):
                 param.requires_grad = requires_grad
 
 
+class Identity(nn.Module):
+    """Do nothing.
+
+    returns:
+        x (nn.tensor): the tensor to perform a no-op forward pass on
+    """
+    def forward(self, x):
+        """A no-op forward pass.
+
+        returns:
+            x (nn.tensor): the tensor to perform a no-op forward pass on
+        """
+        return x
+
+
 def get_norm_layer(norm_type='instance'):
     """Return a normalization layer. For BatchNorm, we use learnable affine parameters and track
     running statistics (mean/stddev). For InstanceNorm, we do not use learnable affine parameters.
