@@ -16,7 +16,7 @@ def load_from_url(url):
         url (str): the URL that points to the image to fetch
 
     returns:
-        (numpy.array): the image loaded as a numpy array
+        (numpy.array): the image loaded as a numpy float array
     """
     response = requests.get(url, timeout=60)
     return load_image(BytesIO(response.content))
@@ -27,7 +27,7 @@ def load_image(path, bits=8):
 
     params:
         path (str or file): the filepath to open or file object to load
-        bits (int) optional: TODO (default 8)
+        bits (int) optional: bit-depth of the image for normalizing to [0-1] (default 8)
 
     returns:
         (numpy.array): the image loaded as a numpy array
@@ -41,7 +41,7 @@ def load_depth(path, bit_depth=16):
 
     params:
         path (str or file): the filepath to open or file object to load
-        bits (int) optional: TODO (default 16)
+        bits (int) optional: bit-depth of the depth map (default 16)
 
     returns:
         (numpy.array): the depth map loaded as a numpy array
@@ -58,7 +58,7 @@ def np_to_pil(img, bits=8):
 
     params:
         img (numpy.array): the numpy array to convert to PIL Image
-        bits (int) optional: TODO (default 8)
+        bits (int) optional: desired bit-depth of output PIL Image (default 8)
 
     returns:
         (PIL.Image): the image converted to a PIL Image object
@@ -72,13 +72,13 @@ def np_to_pil(img, bits=8):
 
 
 def random_color_jitter(img):
-    """TODO DESCRIPTION
+    """perform a random color jitter on an rgb image for augmentation
 
     params:
-        img (TODO): TODO
+        img (PIL.Image or torch.Tensor): image to be color jittered
 
     returns:
-        sat_img (TODO): TODO
+        sat_img (PIL.Image or torch.Tensor): color jittered image
     """
     hue_shft = (random.randint(0, 50) / 50.) - 0.5
     hue_img = TF.adjust_hue(img, hue_shft)
@@ -99,12 +99,12 @@ def random_crop_and_resize(images, output_size=384,  min_crop=128):
     images.
 
     params:
-        images (TODO): TODO
+        images (list of torch.Tensor): list of images to randomly crop (same crop on all images)
         output_size (int) optional: the height and width to output the image with (default 384)
         min_crop (int) optional: the minimum allowable cropping amount (default 128)
 
     returns:
-        images (TODO): cropped and reiszed images
+        images (list of torch.Tensor): cropped and resized images
     """
     _, h, w = images[0].shape
 
@@ -122,22 +122,23 @@ def random_crop_and_resize(images, output_size=384,  min_crop=128):
 
 
 def random_flip(images, p=0.5):
-    """TODO DESCRIPTION
+    """Perform a horizontal flip with a certain probability on a set of images
 
     params:
-        images (TODO): TODO
-        p (float) optional: TODO (default 0.5)
+        images (list of torch.Tensor): list of images to randomly flip
+        p (float) optional: probability of flipping (default 0.5)
 
     returns:
-        (TODO): TODO
+        (list of torch.Tensor): list of randomly flipped images
     """
-    if random.random() > p:
+    if random.random() < p:
         images = [TF.hflip(x) for x in images]
     return images
 
 
 def get_main_img(soup):
-    """Extract the URL for the main image from a web page's content.
+    """Extract the URL for the main image from a web page's content. This function is specifically
+    for downloading images from the OpenSurfaces website
 
     params:
         soup (BeautifulSoup): the content of a web page loaded with beautifulsoup
@@ -188,6 +189,5 @@ def load_opensurfaces_image(id_num):
     img_arr = load_image(img_path)
 
     h, w, _ = img_arr.shape
-    print(h, w)
 
     return img_arr, soup

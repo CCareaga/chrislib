@@ -28,31 +28,33 @@ def pad_bb(bounding_box, amount=7):
 
 
 def add_chan(img):
-    """Add a channel dimension to an image.
+    """Add an channel dimension to convert a gray-scale image 
+    to an RGB image
 
     params:
-        img (numpy.array): TODO
+        img (numpy.array): numpy array image (H x W)
 
     returns:
-        (numpy.array): the numpy image with an added channel dimension
+        (numpy.array): the numpy image with an added channel dimension (H x W x C)
     """
     return np.stack([img] * 3, -1)
 
 
 def _tile_row(images, text, border, font, font_pos, font_color, text_box):
-    """TODO DESCRIPTION
+    """helper function to for tile_imgs and show that creates a single row 
+    of tiled images 
 
     params:
-        images (TODO): TODO
-        text (TODO): TODO
-        border (int): the size of border to add to each image
-        font (TODO): TODO
-        font_pos (tuple): the (x,y) coordinates to anchor the text (2 integers)
+        images (list of np.array): array of images to tile
+        text (list of string): list of strings to draw on each image
+        border (int): the size of border to add between each image
+        font (TODO): font to use to render text on images
+        font_pos (tuple): the (x,y) coordinates to anchor the text relative to top-left (2 integers)
         font_color (tuple): the RGB values for the desired color (3 integers)
-        text_box (TODO): TODO
+        text_box (int): opacity of text box around text, None for no text box
 
     returns:
-        concat (TODO): TODO
+        concat (np.array): row of images as a single tiled image
     """
     assert(len(images) == len(text))
 
@@ -104,20 +106,20 @@ def tile_imgs(
         border=20,
         cmap='viridis',
         quality=75):
-    """TODO DESCRIPTION
+    """Tile a set of numpy images into a grid with text and spaces in between.
 
     params:
-        images (TODO): TODO
+        images (list of np.array): images to tile, can be 1D or 2D array (must be rectangular grid)
         rescale (float) optional: the desired amount to rescale the tiled images (default 1.0)
-        text (array-like) optional: TODO (default None)
+        text (array-like) optional: text to put on each image, must be same shape as image array (default None)
         font_size (int) optional: the desired size of the font (default 16)
         font_file (str) optional: a filename or path to a file containing a TrueType font
         font_color (tuple) optional: the RGB values for the desired color (3 integers) (default
             None)
         font_pos (tuple) optional: the (x,y) coordinates to anchor the text (2 integers) (default
             (0, 0))
-        text_box (TODO) optional: TODO (default None)
-        display (bool) optional: whether to display the tiled images
+        text_box (int) optional: opacity of text box around text, no text box if set to None (default None)
+        display (bool) optional: whether to display the tiled images (uses matplotlib to show tiled images)
         save (str) optional: the filename or path to save the tiled images to. Use None to not save
             (default None)
         border (int) optional: the size of border to add to each image (default 20)
@@ -127,7 +129,7 @@ def tile_imgs(
             (best) is 90 (default 75)
 
     returns:
-        tiled (TODO): TODO
+        tiled (np.array): single image of the tiled image set
     """
     if not isinstance(images, list):
         print("expected list of images")
@@ -183,10 +185,10 @@ def tile_imgs(
 
 
 def show(img, size=(16, 9), save=None):
-    """TODO DESCRIPTION
+    """Show a set of images as a tiled image using Matplotlib imshow (used in Jupyter notebooks)
 
     params:
-        img (TODO): TODO
+        img (list of np.array): set of images to tile (can be 1D or 2D, must be rectangular)
         size (tuple) optional: the integer width and height values (default (16,9))
         save (str) optional: the filename or path to save the tiled images to. Use None to not save
             (default None)
@@ -200,18 +202,18 @@ def show(img, size=(16, 9), save=None):
 
 
 def match_scale(pred, grnd, mask=None, skip_close=False, threshold=0.001, subsample=1.0):
-    """TODO DESCRIPTION
+    """Match the scale between two arrays using least-squares
 
     params:
-        pred (TODO): TODO
-        grnd (TODO): TODO
-        mask (TODO) optional: TODO (default None)
-        skip_close (bool) optional: TODO (default False)
-        threshold (float) optional: TODO (default 0.001)
-        subsample (float) optional: TODO (default 1.0)
+        pred (np.array): numpy array to be scaled
+        grnd (np.array): numpy array to determine the scale
+        mask (np.array) optional: values to include in the least-squares computation (default None)
+        skip_close (bool) optional: whether or not to avoid scaling if determined scale is already close to 1 (default False)
+        threshold (float) optional: threshold to determine if scale is close to 1 (default 0.001)
+        subsample (float) optional: porportion of pixels to subsample for least-squares computation (default 1.0)
 
     returns:
-        (TODO): TODO
+        (np.array): the input pred array scaled to most closely match grnd
     """
     if mask is None:
         mask = np.ones(pred.shape[:2]).astype(bool)
@@ -232,16 +234,16 @@ def match_scale(pred, grnd, mask=None, skip_close=False, threshold=0.001, subsam
 
 
 def get_scale(a, b, mask=None, subsample=1.0):
-    """TODO DESCRIPTION
+    """Function to find scale that most closely matches a to b
 
     params:
-        a (TODO): TODO
-        b (TODO): TODO
-        mask (TODO) optional: TODO (default None)
-        subsample (float) optional: TODO (default 1.0)
+        a (np.array): array to be scaled
+        b (np.array): array to determine the scale
+        mask (np.array) optional: mask denoting pixels that should be used in the computation (default None)
+        subsample (float) optional: porportion of pixels to subsample for least-squares computation (default 1.0)
 
     returns:
-        scale (TODO): TODO
+        scale (float): scale value x that minimizes sum(|a*x - b|^2)
     """
     if mask is None:
         mask = np.ones(pred.shape[:2])
@@ -262,14 +264,14 @@ def get_scale(a, b, mask=None, subsample=1.0):
 
 
 def get_brightness(rgb, mode='numpy'):
-    """TODO DESCRIPTION
+    """use the CCIR601 YIQ method to compute brightness of an RGB image
 
     params:
-        rgb (TODO): TODO
-        mode (str) optional: TODO (default "numpy")
+        rgb (np.array or torch.Tensor): RGB image to convert to luminance
+        mode (str) optional: whether the input is numpy or torch (default "numpy")
 
     returns:
-        brightness (TODO): TODO
+        brightness (np.array or torch.Tensor): single channel image of brightness values
     """
     # "CCIR601 YIQ" method for computing brightness
     if mode == 'numpy':
@@ -281,33 +283,33 @@ def get_brightness(rgb, mode='numpy'):
     return computed_brightness
 
 def minmax(img):
-    """TODO DESCRIPTION
+    """Min-Max normalize an image to put it in the [0-1] domain
 
     params:
-        img (TODO): TODO
+        img (np.array or torch.Tensor): image to be normalized
 
     returns:
-        img (TODO): TODO
+        img (np.array or torch.Tensor): min-max normalized image
     """
     return (img - img.min()) / img.max()
 
 
-def inv_2_real(inv_shd):
-    """TODO DESCRIPTION
-
-    params:
-        inv_shd (TODO): TODO
-
-    returns:
-        shd (TODO): TODO
-    """
-    # first normalize the network inverse shading to be [0,1]
-    norm_inv_shd = minmax(inv_shd)
-
-    # convert to regular shading, clip very small values for division
-    shd = (1.0 / norm_inv_shd.clip(1e-5)) - 1.0
-
-    return shd.clip(1e-5)
+# def inv_2_real(inv_shd):
+#     """TODO DESCRIPTION
+# 
+#     params:
+#         inv_shd (TODO): TODO
+# 
+#     returns:
+#         shd (TODO): TODO
+#     """
+#     # first normalize the network inverse shading to be [0,1]
+#     norm_inv_shd = minmax(inv_shd)
+# 
+#     # convert to regular shading, clip very small values for division
+#     shd = (1.0 / norm_inv_shd.clip(1e-5)) - 1.0
+# 
+#     return shd.clip(1e-5)
 
 
 def round_32(x):
@@ -348,54 +350,59 @@ def to2np(img):
 
 
 def view_scale(img, p=100):
-    """TODO DESCRIPTION
+    """Scale an image for visulization by normalizing based on a percentile.
+    useful for visualizing shading images as it removes outliers.
 
     params:
-        img (TODO): TODO
-        p (int) optional: TODO (default 100)
+        img (np.array): image to be normalized
+        p (int) optional: percentile to compute max value (default 100)
 
     returns:
-        img (numpy.array): TODO
+        img (numpy.array): image after diving by p-th percentile largest value and clipping to [0-1]
     """
     return (img / np.percentile(img, p)).clip(0, 1)
 
 
 def view(img, p=100):
-    """TODO DESCRIPTION
+    """Performs p-th percentile scaling after gamma-correcting the image with a
+    gamma value of 2.2. Basically the view_scale function for linear RGB values
 
     params:
-        img (TODO): TODO
-        p (int) optional: TODO (default 100)
+        img (np.array): image to be scaled for viewing
+        p (int) optional: percentile to compute the largest value (default 100)
 
     returns:
-        img (TODO): TODO
+        img (np.array): image after gamma-correcting, scaling and clipping to [0-1]
     """
     return view_scale(img ** (1/2.2), p=p)
 
 
 def invert(x):
-    """TODO DESCRIPTION
+    """Convert regular shading values to the "inverse shading" domain. More specifically
+    performs the computation 1.0 / (x + 1.0) on a numpy array.
 
     params:
-        x (TODO): TODO
+        x (np.array): values to convert to inverse space
 
     returns:
-        out (TODO): TODO
+        out (np.array): input array with inverted values
     """
     out = 1.0 / (x + 1.0)
     return out
 
 
 def uninvert(x, eps=0.001, clip=True):
-    """TODO DESCRIPTION
+    """Convert inverse shading values to back to the regular shading space.
+    Reverse of the "invert" function. Computed (1.0 / x) - 1.0. Clips values to a
+    minimum of epsilon to avoid divide-by-zero
 
     params:
-        x (TODO): TODO
-        eps (float) optional: TODO (default 0.001)
-        clip (bool) optional: TODO (default True)
+        x (np.array): values to be uninverted
+        eps (float) optional: minimum value allowed in x (default 0.001)
+        clip (bool) optional: whether or not to clip small values (and zeros) in x (default True)
 
     returns:
-        out (TODO): TODO
+        out (np.array): uninverted version of input x
     """
     if clip:
         x = x.clip(eps, 1.0)
@@ -405,14 +412,16 @@ def uninvert(x, eps=0.001, clip=True):
 
 
 def get_tonemap_scale(rgb_color, p=90):
-    """TODO DESCRIPTION
+    """Compute the tonemapping scale for an HDR image following the CGIntrinsics 
+    and Hypersim code-bases. The scale is determined such that the p-th percentile
+    value in the input is equal to 0.8 after performing tonemapping.
 
     params:
-        rgb_color (TODO): TODO
-        p (int) optional: TODO (default 90)
+        rgb_color (np.array): input rgb values to compute tonemap scale
+        p (int) optional: percentile value to map to 0.8 (default 90)
 
     returns:
-        scale (TODO): TODO
+        scale (float): scale to multiple by the input before gamma-correction 
     """
     gamma = 1.0 / 2.2 # standard gamma correction exponent
     inv_gamma = 1.0 / gamma

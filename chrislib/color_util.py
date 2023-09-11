@@ -5,14 +5,14 @@ from chrislib.general import invert, uninvert
 
 
 def rgb2yuv(rgb, clip=True):
-    """TODO DESCRIPTION
+    """convert an rgb numpy image into yuv colorspace
 
     params:
-        rgb (TODO): TODO
-        clip (bool) optional: TODO (default True)
+        rgb (np.array): a 3-channel RGB image as a numpy array
+        clip (bool) optional: whether or not the output should be in [0-1] (default True)
 
     returns:
-        yuv (TODO): TODO
+        yuv (np.array): a 3-channel YUV image as a numpy array
     """
     m = np.array([
         [0.299, -0.147,  0.615],
@@ -29,14 +29,14 @@ def rgb2yuv(rgb, clip=True):
 
 
 def yuv2rgb(yuv, clip=True):
-    """TODO DESCRIPTION
+    """convert an yuv numpy image into rgb colorspace
 
     params:
-        yuv (TODO): TODO
-        clip (bool): TODO (default True)
+        yuv (np.array): a 3-channel YUV image as a numpy array
+        clip (bool): whether or not the output should be in [0-1] (default True)
 
     returns:
-        rgb (TODO): TODO
+        rgb (np.array): a 3-channel RGB image as a numpy array
     """
     m = np.array([
         [1.000,  1.000, 1.000],
@@ -53,14 +53,14 @@ def yuv2rgb(yuv, clip=True):
 
 
 def rgb2luv(rgb, eps=0.001):
-    """TODO DESCRIPTION
+    """convert an RGB numpy image into LUV colorspace
 
     params:
-        rgb (TODO): TODO
-        eps (float): TODO (default 0.001)
+        rgb (np.array): a 3-channel RGB image as a numpy array
+        eps (float) optional: epsilon to add to green channel when dividing (default 0.001)
 
     returns:
-        (TODO): TODO
+        luv (np.array): a 3-channel LUV image as a numpy array
     """
     r = rgb[:, :, 0]
     g = rgb[:, :, 1]
@@ -74,14 +74,14 @@ def rgb2luv(rgb, eps=0.001):
 
 
 def luv2rgb(luv, eps=0.001):
-    """TODO DESCRIPTION
+    """convert an LUV numpy image into RGB colorspace
 
     params:
-        luv (TODO): TODO
-        eps (float): TODO (default 0.001)
+        luv (np.array): a 3-channel RGB image as a numpy array
+        eps (float) optional: epsilon to avoid divide-by-zero (default 0.001)
 
     returns:
-        (TODO): TODO
+        RGB (np.array): a 3-channel RGB image as a numpy array
     """
     l = luv[:, :, 0]
     u = uninvert(luv[:, :, 1], eps=eps)
@@ -95,14 +95,14 @@ def luv2rgb(luv, eps=0.001):
 
 
 def batch_rgb2luv(rgb, eps=0.001):
-    """TODO DESCRIPTION
+    """runs the rgb2luv function on a PyTorch image batch
 
     params:
-        rgb (TODO): TODO
-        eps (float): TODO (default 0.001)
+        rgb (torch.Tensor): batch of RGB images as PyTorch arrays
+        eps (float): epsilon to avoid divide-by-zero (default 0.001)
 
     returns:
-        (TODO): TODO
+        (torch.Tensor): provided RGB image batch in LUV space
     """
     r = rgb[:, 0, :, :]
     g = rgb[:, 1, :, :]
@@ -116,14 +116,14 @@ def batch_rgb2luv(rgb, eps=0.001):
 
 
 def batch_luv2rgb(luv, eps=0.001):
-    """TODO DESCRIPTION
+    """runs the luv2rgb function on a PyTorch image batch
 
     params:
-        luv (TODO): TODO
-        eps (float): TODO (default 0.001)
+        luv (torch.Tensor): batch of LUV images as PyTorch arrays
+        eps (float): epsilon to avoid divide-by-zero (default 0.001)
 
     returns:
-        (TODO): TODO
+        (torch.Tensor): provided LUV image batch in RGB space
     """
     l = luv[:, 0, :, :]
     u = uninvert(luv[:, 1, :, :], eps=eps)
@@ -137,14 +137,14 @@ def batch_luv2rgb(luv, eps=0.001):
 
 
 def batch_rgb2iuv(rgb, eps=0.001):
-    """TODO DESCRIPTION
+    """runs the rgb2iuv function on a PyTorch image batch
 
     params:
-        rgb (TODO): TODO
-        eps (float): TODO (default 0.001)
+        rgb (torch.Tensor): batch of RGB images as PyTorch arrays
+        eps (float): epsilon to avoid divide-by-zero (default 0.001)
 
     returns:
-        (TODO): TODO
+        (torch.Tensor): provided IUV image batch in RGB space
     """
     r = rgb[:, 0, :, :]
     g = rgb[:, 1, :, :]
@@ -160,14 +160,14 @@ def batch_rgb2iuv(rgb, eps=0.001):
 
 
 def batch_iuv2rgb(iuv, eps=0.001):
-    """TODO DESCRIPTION
+    """runs the iuv2rgb function on a PyTorch image batch
 
     params:
-        iuv (TODO): TODO
-        eps (float): TODO (default 0.001)
+        iuv (torch.Tensor): batch of IUV images as PyTorch arrays
+        eps (float): epsilon to avoid divide-by-zero (default 0.001)
 
     returns:
-        (TODO): TODO
+        (torch.Tensor): provided RGB image batch in IUV space
     """
     l = uninvert(iuv[:, 0, :, :], eps=eps)
     u = uninvert(iuv[:, 1, :, :], eps=eps)
