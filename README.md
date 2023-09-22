@@ -25,5 +25,5 @@
 
 #### related packages
 * to use methods and classes from "altered_midas" (https://github.com/CCareaga/MiDaS), run `pip install https://github.com/CCareaga/MiDaS/archive/master.zip`. Add altered_midas to requirements.txt as this line: `altered_midas @ git+https://github.com/CCareaga/MiDaS@master`
-* to use methods and classes from "omnidata_tools" (https://github.com/CCareaga/omnidata), run `pip install https://github.com/CCareaga/omnidata/archive/main.zip`. Add omnidata_tools to requirements.txt as this line: `omnidata_tools @ git+https://github.com/CCareaga/omnidata@main`
+* to use methods and classes from "omnidata_tools" (https://github.com/CCareaga/omnidata), run `pip install https://github.com/CCareaga/omnidata/archive/main.zip`. Add omnidata_tools to requirements.txt as this line: `omnidata_tools @ git+https://github.com/CCareaga/omnidata@main` (NOTE: currently the omnidata model code only works with older versions of timm, currently 0.6.13 is tested)
 
