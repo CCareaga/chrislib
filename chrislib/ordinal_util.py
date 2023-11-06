@@ -60,14 +60,14 @@ def equalize_predictions(img, base, full, p=0.5):
 
     full_shd = (1. / full.clip(1e-5)) - 1.
     base_shd = (1. / base.clip(1e-5)) - 1.
-
+    
     full_alb = get_brightness(img) / full_shd.clip(1e-5)
     base_alb = get_brightness(img) / base_shd.clip(1e-5)
 
-    rand_msk = np.random.randn(h, w) > p
+    rand_msk = (np.random.randn(h, w) > p).astype(np.uint8)
 
-    flat_full_alb = full_alb[np.where(rand_msk == 1)]
-    flat_base_alb = base_alb[np.where(rand_msk == 1)]
+    flat_full_alb = full_alb[rand_msk == 1]
+    flat_base_alb = base_alb[rand_msk == 1]
 
     scale, _, _, _ = np.linalg.lstsq(flat_full_alb.reshape(-1, 1), flat_base_alb, rcond=None)
 
@@ -106,10 +106,10 @@ def ordinal_forward(model, img, normalize=False, dev='cuda'):
         base_out = minmax(base_out)
         full_out = minmax(full_out)
 
-    base_out = base_out.cpu().numpy()
-    full_out = full_out.cpu().numpy()
+    base_out = base_out.unsqueeze(-1).cpu().numpy()
+    full_out = full_out.cpu().unsqueeze(-1).numpy()
 
-    base_est = resize(base_out, (fh, fw, 1))
-    full_est = resize(full_out, (fh, fw, 1))
+    base_est = resize(base_out, (fh, fw))
+    full_est = resize(full_out, (fh, fw))
 
     return equalize_predictions(img, base_est, full_est)

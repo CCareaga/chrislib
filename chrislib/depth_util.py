@@ -5,8 +5,8 @@ import numpy as np
 import torch
 from torchvision.transforms import Compose
 
-# CURR_PATH = '/home/chris/research/intrinsic/misc'
-CURR_PATH = '/project/aksoy-lab/chris/misc'
+CURR_PATH = '/home/chris/research/intrinsic/misc/boosted_depth'
+# CURR_PATH = '/project/aksoy-lab/chris/misc/'
 sys.path.append(CURR_PATH)
 
 # OUR

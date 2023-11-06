@@ -7,6 +7,18 @@ from skimage.transform import resize
 
 from chrislib.data_util import np_to_pil
 
+def rescale(img, scale):
+    """resize an image according to a given scale
+
+    params:
+        img (numpy.array): an image as a np.array (can be HxW or HxWxC)
+        scale (float): scale with which to resize the image dimensions
+
+    returns:
+        (numpy.array): the scaled image
+    """
+    h, w = img.shape[:1]
+    return resize(img, (int(h * scale), int(w * scale)))
 
 def pad_bb(bounding_box, amount=7):
     """Add padding to all elements of a PIL ImageDraw text bounding box.
@@ -37,6 +49,12 @@ def add_chan(img):
     returns:
         (numpy.array): the numpy image with an added channel dimension (H x W x C)
     """
+
+    # if the provided image already has a channel dim, assume it's a grayscale
+    # image and make it HxW by grabbing the first channel
+    if len(img.shape) == 3:
+        img = img[:, :, 0]
+
     return np.stack([img] * 3, -1)
 
 
@@ -263,12 +281,13 @@ def get_scale(a, b, mask=None, subsample=1.0):
     return scale
 
 
-def get_brightness(rgb, mode='numpy'):
+def get_brightness(rgb, mode='numpy', keep_dim=True):
     """use the CCIR601 YIQ method to compute brightness of an RGB image
 
     params:
         rgb (np.array or torch.Tensor): RGB image to convert to luminance
         mode (str) optional: whether the input is numpy or torch (default "numpy")
+        keep_dim (bool) optional: whether or not to maintain the channel dimension
 
     returns:
         brightness (np.array or torch.Tensor): single channel image of brightness values
@@ -276,11 +295,15 @@ def get_brightness(rgb, mode='numpy'):
     # "CCIR601 YIQ" method for computing brightness
     if mode == 'numpy':
         brightness = (0.3 * rgb[:,:,0]) + (0.59 * rgb[:,:,1]) + (0.11 * rgb[:,:,2])
-        computed_brightness = brightness[:, :, np.newaxis]
+        if keep_dim:
+            brightness = brightness[:, :, np.newaxis]
+
     if mode == 'torch':
         brightness = (0.3 * rgb[0,:,:]) + (0.59 * rgb[1,:,:]) + (0.11 * rgb[2, :,:])
-        computed_brightness = brightness.unsqueeze(0)
-    return computed_brightness
+        if keep_dim:
+            brightness = brightness.unsqueeze(0)
+
+    return brightness
 
 def minmax(img):
     """Min-Max normalize an image to put it in the [0-1] domain

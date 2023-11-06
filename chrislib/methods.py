@@ -5,8 +5,8 @@ import numpy as np
 import torch
 from torchvision.transforms import functional as TF
 
-from luo_2020.config import TestOptions
-from luo_2020.model.manager import create_model
+# from luo_2020.config import TestOptions
+# from luo_2020.model.manager import create_model
 
 from chrislib.general import round_32, round_128, to2np, view_scale
 from chrislib.data_util import load_image, np_to_pil
