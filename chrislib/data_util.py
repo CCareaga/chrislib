@@ -121,7 +121,7 @@ def random_crop_and_resize(images, output_size=384,  min_crop=128):
     return images
 
 
-def random_flip(images, p=0.5):
+def random_flip(images, p=0.5, mode='h'):
     """Perform a horizontal flip with a certain probability on a set of images
 
     params:
@@ -132,7 +132,11 @@ def random_flip(images, p=0.5):
         (list of torch.Tensor): list of randomly flipped images
     """
     if random.random() < p:
-        images = [TF.hflip(x) for x in images]
+        if mode == 'h':
+            images = [TF.hflip(x) for x in images]
+        elif mode == 'v':
+            images = [TF.vflip(x) for x in images]
+
     return images
 
 

@@ -2,7 +2,7 @@ import kornia.filters as kn_filters
 import kornia.morphology as kn_morph
 import torch
 
-
+@torch.jit.script
 def compute_scale_and_shift(prediction, target, mask):
     """Computes the optimal scale and shift according to least-squares
     criteria between the prediction and the target in the masked area
@@ -57,7 +57,8 @@ def compute_ssi_pred(pred, grnd, mask):
     # NOTE: early in training this scale can be negative, so we can simply clip it
     # at zero. It could also probably just be set to one if less than 0, it's just
     # to help stabilize early training until the network is making reasonable preds
-    scale = torch.nn.functional.relu(scale)
+    # scale = torch.nn.functional.relu(scale)
+    scale[scale <= 0] = 1.0
     print(scale, shift)
 
     return (pred * scale.view(-1, 1, 1)) + shift.view(-1, 1, 1)
@@ -144,7 +145,6 @@ class MSGLoss():
         """
         return self.forward(output, target, mask)
 
-
     def forward(self, output, target, mask):
         """TODO DESCRIPTION
 
@@ -209,7 +209,8 @@ class MSGLoss():
             scale_factor=1/(2**scale),
             mode='bilinear',
             align_corners=True,
-            antialias=True)
+            antialias=True
+        )
         return scaled
 
 
@@ -227,7 +228,7 @@ class MSGLoss():
         grad_x, grad_y = self.imgDerivative(diff, self.taps[scale])
 
         # B x C x H x W
-        grad_magnitude = torch.sqrt(torch.pow(grad_x, 2) + torch.pow(grad_y, 2) + 0.001)
+        grad_magnitude = torch.sqrt(torch.pow(grad_x, 2) + torch.pow(grad_y, 2) + 1e-8)
 
         return grad_magnitude
 
