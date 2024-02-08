@@ -59,10 +59,37 @@ def compute_ssi_pred(pred, grnd, mask):
     # to help stabilize early training until the network is making reasonable preds
     # scale = torch.nn.functional.relu(scale)
     scale[scale <= 0] = 1.0
-    print(scale, shift)
 
     return (pred * scale.view(-1, 1, 1)) + shift.view(-1, 1, 1)
 
+
+@torch.jit.script
+def resize_aa(img, scale: int):
+    """TODO DESCRIPTION
+
+    params:
+        img (TODO): TODO
+        scale (TODO): TODO
+
+    returns:
+        (TODO): TODO
+    """
+    if scale == 0:
+        return img
+
+    # blurred = TF.gaussian_blur(img, self.k_size[scale])
+    # scaled = blurred[:, :, ::2**scale, ::2**scale]
+    # blurred = img
+
+    # NOTE: interpolate is noticeably faster than blur and sub-sample
+    scaled = torch.nn.functional.interpolate(
+        img,
+        scale_factor=1/(2**scale),
+        mode='bilinear',
+        align_corners=True,
+        antialias=True
+    )
+    return scaled
 
 def lp_loss(pred, grnd, mask, p=2):
     """Performs a regular LP loss where P is specified. Can be used to
@@ -79,7 +106,7 @@ def lp_loss(pred, grnd, mask, p=2):
     """
     if p == 1:
         lp_term = torch.nn.functional.l1_loss(pred, grnd, reduction='none') * mask
-    if p == 2:
+    else:
         lp_term = torch.nn.functional.mse_loss(pred, grnd, reduction='none') * mask
 
     return lp_term.sum() / (mask.sum() * lp_term.shape[1])
@@ -165,11 +192,11 @@ class MSGLoss():
         loss = 0
         for i in range(self.n_scale):
             # resize with antialias
-            mask_resized = torch.floor(self.resize_aa(mask, i) + 0.001)
+            mask_resized = torch.floor(resize_aa(mask, i) + 0.001)
 
             # erosion to mask out pixels that are effected by unkowns
             mask_resized = kn_morph.erosion(mask_resized, self.erod_kernels[i])
-            diff_resized = self.resize_aa(diff, i)
+            diff_resized = resize_aa(diff, i)
 
             # compute grads
             grad_mag = self.gradient_mag(diff_resized, i)
@@ -186,32 +213,6 @@ class MSGLoss():
         loss /= self.n_scale
         return loss
 
-    def resize_aa(self, img, scale):
-        """TODO DESCRIPTION
-
-        params:
-            img (TODO): TODO
-            scale (TODO): TODO
-
-        returns:
-            (TODO): TODO
-        """
-        if scale == 0:
-            return img
-
-        # blurred = TF.gaussian_blur(img, self.k_size[scale])
-        # scaled = blurred[:, :, ::2**scale, ::2**scale]
-        # blurred = img
-
-        # NOTE: interpolate is noticeably faster than blur and sub-sample
-        scaled = torch.nn.functional.interpolate(
-            img,
-            scale_factor=1/(2**scale),
-            mode='bilinear',
-            align_corners=True,
-            antialias=True
-        )
-        return scaled
 
 
     def gradient_mag(self, diff, scale):
