@@ -414,11 +414,13 @@ def run_slic(gtdisp, nsamples, compactness=1):
         point_pairs (TODO): TODO
         seg_img (TODO): TODO
     """
+    chan_axis = None if len(gtdisp.shape) == 2 else -1
     segments = slic(
         gtdisp,
         n_segments=nsamples,
         compactness=compactness,
         start_label=0,
+        channel_axis=chan_axis,
         slic_zero=True)
 
     segments_ids = np.unique(segments)

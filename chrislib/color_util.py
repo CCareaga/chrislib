@@ -93,6 +93,49 @@ def luv2rgb(luv, eps=0.001):
 
     return np.stack((r, g, b), axis=-1)
 
+def rgb2iuv(rgb, eps=0.001):
+    """convert an RGB numpy image into IUV colorspace
+
+    params:
+        rgb (np.array): a 3-channel RGB image as a numpy array
+        eps (float) optional: epsilon to add to green channel when dividing (default 0.001)
+
+    returns:
+        iuv (np.array): a 3-channel IUV image as a numpy array
+    """
+    r = rgb[:, :, 0]
+    g = rgb[:, :, 1]
+    b = rgb[:, :, 2]
+
+    l = (r * 0.299) + (g * 0.587) + (b * 0.114)
+
+    i = invert(l)
+    u = invert(r / (g + eps))
+    v = invert(b / (g + eps))
+
+    return np.stack((i, u, v), axis=-1)
+
+
+def iuv2rgb(iuv, eps=0.001):
+    """convert an LUV numpy image into RGB colorspace
+
+    params:
+        luv (np.array): a 3-channel RGB image as a numpy array
+        eps (float) optional: epsilon to avoid divide-by-zero (default 0.001)
+
+    returns:
+        RGB (np.array): a 3-channel RGB image as a numpy array
+    """
+    l = uninvert(iuv[:, :, 0])
+    u = uninvert(iuv[:, :, 1], eps=eps)
+    v = uninvert(iuv[:, :, 2], eps=eps)
+
+    g = l / ((u * 0.299) + (v * 0.114) + 0.587)
+    r = g * u
+    b = g * v
+
+    return np.stack((r, g, b), axis=-1)
+
 
 def batch_rgb2luv(rgb, eps=0.001):
     """runs the rgb2luv function on a PyTorch image batch

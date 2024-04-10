@@ -57,8 +57,10 @@ def compute_ssi_pred(pred, grnd, mask):
     # NOTE: early in training this scale can be negative, so we can simply clip it
     # at zero. It could also probably just be set to one if less than 0, it's just
     # to help stabilize early training until the network is making reasonable preds
-    # scale = torch.nn.functional.relu(scale)
-    scale[scale <= 0] = 1.0
+
+    scale = torch.nn.functional.relu(scale)
+    # scale[scale <= 0] = 1.0
+    # scale = torch.abs(scale)
 
     return (pred * scale.view(-1, 1, 1)) + shift.view(-1, 1, 1)
 
@@ -206,9 +208,11 @@ class MSGLoss():
 
             # average the per pixel diffs
             temp = mask_resized * grad_mag
-
-            # pylint: disable-next=line-too-long
-            loss += torch.sum(mask_resized * grad_mag) / (torch.sum(mask_resized) * grad_mag.shape[1])
+            
+            mask_sum = torch.sum(mask_resized)
+            if mask_sum != 0:
+                # pylint: disable-next=line-too-long
+                loss += torch.sum(mask_resized * grad_mag) / (mask_sum * grad_mag.shape[1])
 
         loss /= self.n_scale
         return loss
