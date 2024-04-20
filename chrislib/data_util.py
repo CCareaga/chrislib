@@ -5,6 +5,7 @@ from io import BytesIO
 import requests
 from PIL import Image
 import numpy as np
+import torch
 import torchvision.transforms.functional as TF
 from bs4 import BeautifulSoup
 
@@ -71,6 +72,20 @@ def np_to_pil(img, bits=8):
     return Image.fromarray(int_img)
 
 
+def random_color_shift(image, mean=0.5, std=0.05):
+    """Randomly change the color temperature of an image in RGB space while maintaining luminance."""
+
+    # Generate a random color temp and normalize it to maintain luminance
+    temperature = np.random.normal(mean, std, size=3)
+    temperature = temperature.clip(0.1, 1)
+    temperature /= (np.sum(temperature) / 3)
+    
+    # Multiply each pixel of the image by the color multiplier
+    adjusted_image = image * torch.from_numpy(temperature.reshape(-1, 1, 1))
+    # adjusted_image = np.clip(adjusted_image, 0, 1)
+
+    return adjusted_image.clip(0, 1).float()
+
 def random_color_jitter(img):
     """perform a random color jitter on an rgb image for augmentation
 
@@ -121,7 +136,7 @@ def random_crop_and_resize(images, output_size=384,  min_crop=128):
     return images
 
 
-def random_flip(images, p=0.5):
+def random_flip(images, p=0.5, mode='h'):
     """Perform a horizontal flip with a certain probability on a set of images
 
     params:
@@ -132,7 +147,11 @@ def random_flip(images, p=0.5):
         (list of torch.Tensor): list of randomly flipped images
     """
     if random.random() < p:
-        images = [TF.hflip(x) for x in images]
+        if mode == 'h':
+            images = [TF.hflip(x) for x in images]
+        elif mode == 'v':
+            images = [TF.vflip(x) for x in images]
+
     return images
 
 

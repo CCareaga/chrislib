@@ -2,7 +2,7 @@ import kornia.filters as kn_filters
 import kornia.morphology as kn_morph
 import torch
 
-
+@torch.jit.script
 def compute_scale_and_shift(prediction, target, mask):
     """Computes the optimal scale and shift according to least-squares
     criteria between the prediction and the target in the masked area
@@ -57,11 +57,41 @@ def compute_ssi_pred(pred, grnd, mask):
     # NOTE: early in training this scale can be negative, so we can simply clip it
     # at zero. It could also probably just be set to one if less than 0, it's just
     # to help stabilize early training until the network is making reasonable preds
+
     scale = torch.nn.functional.relu(scale)
-    print(scale, shift)
+    # scale[scale <= 0] = 1.0
+    # scale = torch.abs(scale)
 
     return (pred * scale.view(-1, 1, 1)) + shift.view(-1, 1, 1)
 
+
+@torch.jit.script
+def resize_aa(img, scale: int):
+    """TODO DESCRIPTION
+
+    params:
+        img (TODO): TODO
+        scale (TODO): TODO
+
+    returns:
+        (TODO): TODO
+    """
+    if scale == 0:
+        return img
+
+    # blurred = TF.gaussian_blur(img, self.k_size[scale])
+    # scaled = blurred[:, :, ::2**scale, ::2**scale]
+    # blurred = img
+
+    # NOTE: interpolate is noticeably faster than blur and sub-sample
+    scaled = torch.nn.functional.interpolate(
+        img,
+        scale_factor=1/(2**scale),
+        mode='bilinear',
+        align_corners=True,
+        antialias=True
+    )
+    return scaled
 
 def lp_loss(pred, grnd, mask, p=2):
     """Performs a regular LP loss where P is specified. Can be used to
@@ -78,7 +108,7 @@ def lp_loss(pred, grnd, mask, p=2):
     """
     if p == 1:
         lp_term = torch.nn.functional.l1_loss(pred, grnd, reduction='none') * mask
-    if p == 2:
+    else:
         lp_term = torch.nn.functional.mse_loss(pred, grnd, reduction='none') * mask
 
     return lp_term.sum() / (mask.sum() * lp_term.shape[1])
@@ -144,7 +174,6 @@ class MSGLoss():
         """
         return self.forward(output, target, mask)
 
-
     def forward(self, output, target, mask):
         """TODO DESCRIPTION
 
@@ -165,11 +194,11 @@ class MSGLoss():
         loss = 0
         for i in range(self.n_scale):
             # resize with antialias
-            mask_resized = torch.floor(self.resize_aa(mask, i) + 0.001)
+            mask_resized = torch.floor(resize_aa(mask, i) + 0.001)
 
             # erosion to mask out pixels that are effected by unkowns
             mask_resized = kn_morph.erosion(mask_resized, self.erod_kernels[i])
-            diff_resized = self.resize_aa(diff, i)
+            diff_resized = resize_aa(diff, i)
 
             # compute grads
             grad_mag = self.gradient_mag(diff_resized, i)
@@ -179,38 +208,15 @@ class MSGLoss():
 
             # average the per pixel diffs
             temp = mask_resized * grad_mag
-
-            # pylint: disable-next=line-too-long
-            loss += torch.sum(mask_resized * grad_mag) / (torch.sum(mask_resized) * grad_mag.shape[1])
+            
+            mask_sum = torch.sum(mask_resized)
+            if mask_sum != 0:
+                # pylint: disable-next=line-too-long
+                loss += torch.sum(mask_resized * grad_mag) / (mask_sum * grad_mag.shape[1])
 
         loss /= self.n_scale
         return loss
 
-    def resize_aa(self, img, scale):
-        """TODO DESCRIPTION
-
-        params:
-            img (TODO): TODO
-            scale (TODO): TODO
-
-        returns:
-            (TODO): TODO
-        """
-        if scale == 0:
-            return img
-
-        # blurred = TF.gaussian_blur(img, self.k_size[scale])
-        # scaled = blurred[:, :, ::2**scale, ::2**scale]
-        # blurred = img
-
-        # NOTE: interpolate is noticeably faster than blur and sub-sample
-        scaled = torch.nn.functional.interpolate(
-            img,
-            scale_factor=1/(2**scale),
-            mode='bilinear',
-            align_corners=True,
-            antialias=True)
-        return scaled
 
 
     def gradient_mag(self, diff, scale):
@@ -227,7 +233,7 @@ class MSGLoss():
         grad_x, grad_y = self.imgDerivative(diff, self.taps[scale])
 
         # B x C x H x W
-        grad_magnitude = torch.sqrt(torch.pow(grad_x, 2) + torch.pow(grad_y, 2) + 0.001)
+        grad_magnitude = torch.sqrt(torch.pow(grad_x, 2) + torch.pow(grad_y, 2) + 1e-8)
 
         return grad_magnitude
 
