@@ -7,7 +7,7 @@ from skimage.transform import resize
 
 from chrislib.data_util import np_to_pil
 
-def rescale(img, scale):
+def rescale(img, scale, r32=False):
     """resize an image according to a given scale
 
     params:
@@ -17,8 +17,9 @@ def rescale(img, scale):
     returns:
         (numpy.array): the scaled image
     """
-    h, w = img.shape[:1]
-    return resize(img, (int(h * scale), int(w * scale)))
+    h, w = img.shape[:2]
+    round_func = round_32 if r32 else int
+    return resize(img, (round_func(h * scale), round_func(w * scale)), preserve_range=True)
 
 def pad_bb(bounding_box, amount=7):
     """Add padding to all elements of a PIL ImageDraw text bounding box.

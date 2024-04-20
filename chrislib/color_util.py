@@ -3,6 +3,22 @@ import numpy as np
 
 from chrislib.general import invert, uninvert
 
+def rgb_to_srgb(rgb):
+    ret = np.zeros_like(rgb)
+    idx0 = rgb <= 0.0031308
+    idx1 = rgb > 0.0031308
+    ret[idx0] = rgb[idx0] * 12.92
+    ret[idx1] = np.power(1.055 * rgb[idx1], 1.0 / 2.4) - 0.055
+    return ret
+
+
+def srgb_to_rgb(srgb):
+    ret = np.zeros_like(srgb)
+    idx0 = srgb <= 0.04045
+    idx1 = srgb > 0.04045
+    ret[idx0] = srgb[idx0] / 12.92
+    ret[idx1] = np.power((srgb[idx1] + 0.055) / 1.055, 2.4)
+    return ret
 
 def rgb2yuv(rgb, clip=True):
     """convert an rgb numpy image into yuv colorspace
