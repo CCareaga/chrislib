@@ -76,8 +76,8 @@ def angular_error(gt, pred, mask):
     returns:
         (TODO): TODO
     """
-    gt = gt.astype(np.float64)
-    pred = pred.astype(np.float64)
+    gt = gt.astype(np.double)
+    pred = pred.astype(np.double)
 
     gt /= np.linalg.norm(gt, axis=-1, keepdims=True).clip(1e-4)
     pred /= np.linalg.norm(pred, axis=-1, keepdims=True).clip(1e-4)

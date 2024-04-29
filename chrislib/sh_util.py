@@ -249,7 +249,7 @@ def resizeImage(img, width, height, interpolation=cv2.INTER_CUBIC):
             r = skimage.measure.block_reduce(img[:,:,0], (blockSize,blockSize), np.max)
             g = skimage.measure.block_reduce(img[:,:,1], (blockSize,blockSize), np.max)
             b = skimage.measure.block_reduce(img[:,:,2], (blockSize,blockSize), np.max)
-            img = np.dstack((np.dstack((r,g)),b)).astype(np.float32)
+            img = np.dstack((np.dstack((r,g)),b)).astype(np.single)
             return img
         except:
             print("Failed to do max_pooling, using default")
@@ -258,10 +258,10 @@ def resizeImage(img, width, height, interpolation=cv2.INTER_CUBIC):
         return cv2.resize(img, (width, height), interpolation=interpolation)
 
 def grey2colour(greyImg):
-    return (np.repeat(greyImg[:,:][:, :, np.newaxis], 3, axis=2)).astype(np.float32)
+    return (np.repeat(greyImg[:,:][:, :, np.newaxis], 3, axis=2)).astype(np.single)
 
 def colour2grey(colImg):
-    return ((colImg[:,:,0]+colImg[:,:,1]+colImg[:,:,2])/3).astype(np.float32)
+    return ((colImg[:,:,0]+colImg[:,:,1]+colImg[:,:,2])/3).astype(np.single)
 
 def poleScale(y, width, relative=True):
     """
@@ -342,7 +342,7 @@ def getDiffuseMap(ibl_name, width=600, widthLowRes=32, outputWidth=None):
     if widthLowRes < outputWidth:
         outputDiffuseMap = resizeImage(outputDiffuseMap, outputWidth, int(outputWidth/2), cv2.INTER_LANCZOS4)
 
-    return outputDiffuseMap.astype(np.float32)
+    return outputDiffuseMap.astype(np.single)
 
 # Spherical harmonics reconstruction
 def getDiffuseCoefficients(lmax):
@@ -363,7 +363,7 @@ def shReconstructSignal(coeffs, sh_basis_matrix=None, width=600):
     if sh_basis_matrix is None:
         lmax = sh_lmax_from_terms(coeffs.shape[0])
         sh_basis_matrix = getCoefficientsMatrix(width,lmax)
-    return np.dot(sh_basis_matrix,coeffs).astype(np.float32)
+    return np.dot(sh_basis_matrix,coeffs).astype(np.single)
 
 def shRender(iblCoeffs, width=600):
     lmax = sh_lmax_from_terms(iblCoeffs.shape[0])
@@ -419,7 +419,7 @@ def shReconstructDiffuseMap(iblCoeffs, width=600):
     else: # !L2
         renderedImage = shRender(iblCoeffs, width)
 
-    return renderedImage.astype(np.float32)
+    return renderedImage.astype(np.single)
 
 def writeReconstruction(c, lmax, fn='', width=600, outputDir='./output/'):
     im.imwrite(outputDir+'_sh_light_l'+str(lmax)+fn+'.exr',shReconstructSignal(c, width=width))
@@ -582,7 +582,7 @@ if __name__ == "__main__":
 
     # Read image
     ibl_GT = resizeImage(im.imread(ibl_filename, 'EXR-FI')[:,:,0:3], resizeWidth, resizeHeight, cv2.INTER_CUBIC)
-    im.imwrite(outputDir+'_ibl_GT.exr', ibl_GT.astype(np.float32))
+    im.imwrite(outputDir+'_ibl_GT.exr', ibl_GT.astype(np.single))
 
     # SPH projection
     iblCoeffs = getCoefficientsFromFile(ibl_filename, lmax, resizeWidth=resizeWidth)
@@ -595,6 +595,6 @@ if __name__ == "__main__":
     outputWidth = resizeWidth
     fn = outputDir+'_diffuse_ibl_GT_'+str(resizeWidth)+'_'+str(diffuseLowResWidth)+'_'+str(outputWidth)+'.exr'
     diffuse_ibl_GT = getDiffuseMap(ibl_filename, width=resizeWidth, widthLowRes=diffuseLowResWidth, outputWidth=outputWidth) 
-    im.imwrite(fn, diffuse_ibl_GT.astype(np.float32))
+    im.imwrite(fn, diffuse_ibl_GT.astype(np.single))
 
     print("Complete")

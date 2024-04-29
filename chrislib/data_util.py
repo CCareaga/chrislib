@@ -33,7 +33,7 @@ def load_image(path, bits=8):
     returns:
         (numpy.array): the image loaded as a numpy array
     """
-    np_arr = np.array(Image.open(path)).astype(np.float32)
+    np_arr = np.array(Image.open(path)).astype(np.single)
     return np_arr / float((2 ** bits) - 1)
 
 
@@ -48,10 +48,10 @@ def load_depth(path, bit_depth=16):
         (numpy.array): the depth map loaded as a numpy array
     """
     depth = Image.open(path)
-    depth_arr = np.array(depth).astype(np.float32)
+    depth_arr = np.array(depth).astype(np.single)
     depth_arr = depth_arr / (2**bit_depth)
 
-    return depth_arr.astype(np.float32)
+    return depth_arr.astype(np.single)
 
 
 def np_to_pil(img, bits=8):

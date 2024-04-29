@@ -74,12 +74,12 @@ def calculateprocessingres(
     grad[grad >= middle] = 1
 
     # dilation kernel with size of the receptive field
-    kernel = np.ones((int(basesize/speed_scale), int(basesize/speed_scale)), np.float32)
+    kernel = np.ones((int(basesize/speed_scale), int(basesize/speed_scale)), np.single)
     # dilation kernel with size of the a quarter of receptive field used to compute k
     # as described in section 6 of main paper
     kernel2 = np.ones(
         (int(basesize / (4*speed_scale)), int(basesize / (4*speed_scale))),
-        np.float32)
+        np.single)
 
     # Output resolution limit set by the whole_size_threshold and scale_threshold.
     threshold = min(whole_size_threshold, scale_threshold * max(img.shape[:2]))
