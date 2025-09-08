@@ -177,3 +177,33 @@ def depth_to_normals(depth, k=7, perc=90):
     normal /= np.linalg.norm(normal, axis=-1, keepdims=True)
 
     return normal
+
+
+
+
+def get_dsine_model():
+    """load the DSINE model from pytorch hub
+
+    returns:
+        model (Predictor): DSINE model
+    """
+    return torch.hub.load("hugoycj/DSINE-hub", "DSINE", trust_repo=True)
+
+
+def run_dsine(model, img):
+    """run the DSINE model on an image
+
+    params:
+        model (Predictor): DSINE model
+        img (np.array): input image (np.array in [0, 1])
+
+    returns:
+        normal (np.array): normal map
+    """
+
+    # first convert [0-1] numpy array to opencv format
+    img = (img * 255).astype(np.uint8)
+    with torch.inference_mode():
+        normal = model.infer_pil(img)[0]
+    
+    return normal

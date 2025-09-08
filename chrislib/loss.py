@@ -2,7 +2,7 @@ import kornia.filters as kn_filters
 import kornia.morphology as kn_morph
 import torch
 
-@torch.jit.script
+# @torch.jit.script
 def compute_scale_and_shift(prediction, target, mask):
     """Computes the optimal scale and shift according to least-squares
     criteria between the prediction and the target in the masked area

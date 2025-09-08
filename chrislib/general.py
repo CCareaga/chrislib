@@ -435,22 +435,21 @@ def uninvert(x, eps=0.001, clip=True):
     return out
 
 
-def get_tonemap_scale(rgb_color, p=90):
+def get_tonemap_scale(rgb_color, p=90, target_brightness=0.8):
     """Compute the tonemapping scale for an HDR image following the CGIntrinsics 
     and Hypersim code-bases. The scale is determined such that the p-th percentile
     value in the input is equal to 0.8 after performing tonemapping.
 
     params:
         rgb_color (np.array): input rgb values to compute tonemap scale
-        p (int) optional: percentile value to map to 0.8 (default 90)
+        p (int) optional: percentile value to map to target brightness (default 90)
+        target_brightness (float) optional: brightness value to map p-th percentile to (default 0.8)
 
     returns:
         scale (float): scale to multiple by the input before gamma-correction 
     """
     gamma = 1.0 / 2.2 # standard gamma correction exponent
     inv_gamma = 1.0 / gamma
-    # percentile = 90 # we want this percentile brightness value in the unmodified image...
-    brightness_nth_percentile_desired = 0.8 # ...to be this bright after scaling
 
     brightness       = get_brightness(rgb_color)
     # brightness_valid = brightness[valid_mask]
@@ -467,14 +466,14 @@ def get_tonemap_scale(rgb_color, p=90):
         # https://github.com/snavely/pbrs_tonemapper/blob/master/tonemap_rgbe.py:
         # scale = np.exp(
         #           np.log(
-        #               brightness_nth_percentile_desired) *
+        #               target_brightness) *
         #               inv_gamma -
         #               np.log(brightness_nth_percentile_current))
         #
         # Our expression below is equivalent, but is more intuitive, because it follows more
         # directly from the expression:
-        # (scale*brightness_nth_percentile_current)^gamma = brightness_nth_percentile_desired
+        # (scale*brightness_nth_percentile_current)^gamma = target_brightness
         # pylint: disable-next=line-too-long
-        scale = np.power(brightness_nth_percentile_desired, inv_gamma) / brightness_nth_percentile_current
+        scale = np.power(target_brightness, inv_gamma) / brightness_nth_percentile_current
 
     return scale
