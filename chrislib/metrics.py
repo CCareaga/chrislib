@@ -138,7 +138,7 @@ def delta_error(pred: np.ndarray, target: np.ndarray, mask:np.ndarray=None):
     ratio = np.concatenate((pred/target, target/pred), axis=0)
     max_ratio = np.amax(ratio, axis=0)
 
-    perc = (np.sum((max_ratio < 1.25).astype(np.float32)) / np.sum(mask)) * 100
+    perc = (np.sum((max_ratio < 1.25).astype(np.single)) / np.sum(mask)) * 100
     return perc
 
 
@@ -297,7 +297,7 @@ def lmse_downscale(correct, estimate, mask, window_size, window_shift, downscale
             res_est_curr = cv2.resize(estimate_curr, (downscale, downscale))
 
             res_msk_curr = cv2.resize(
-                mask_curr.astype(np.float32),
+                mask_curr.astype(np.single),
                 (downscale, downscale),
                 cv2.INTER_NEAREST)
             res_msk_curr = res_msk_curr.astype(bool)

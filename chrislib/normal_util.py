@@ -76,8 +76,8 @@ def angular_error(gt, pred, mask):
     returns:
         (TODO): TODO
     """
-    gt = gt.astype(np.float64)
-    pred = pred.astype(np.float64)
+    gt = gt.astype(np.double)
+    pred = pred.astype(np.double)
 
     gt /= np.linalg.norm(gt, axis=-1, keepdims=True).clip(1e-4)
     pred /= np.linalg.norm(pred, axis=-1, keepdims=True).clip(1e-4)
@@ -178,9 +178,6 @@ def depth_to_normals(depth, k=7, perc=90):
 
     return normal
 
-
-
-
 def get_dsine_model():
     """load the DSINE model from pytorch hub
 
@@ -207,3 +204,28 @@ def run_dsine(model, img):
         normal = model.infer_pil(img)[0]
     
     return normal
+
+def draw_normal_circle(nrm, loc, rad, normalize=False):
+    size = rad * 2
+
+    lin = np.linspace(-1, 1, num=size)
+    ys, xs = np.meshgrid(lin, lin)
+
+    zs = np.sqrt((1.0 - (xs**2 + ys**2)).clip(0))
+    valid = (zs != 0)
+    normals = np.stack((ys[valid], -xs[valid], zs[valid]), 1)
+
+    valid_mask = np.zeros((size, size))
+    valid_mask[valid] = 1
+
+    full_mask = np.zeros((nrm.shape[0], nrm.shape[1]))
+    x = loc[0] - rad
+    y = loc[1] - rad
+    full_mask[y : y + size, x : x + size] = valid_mask
+    
+    if normalize:
+        normals = (normals + 1.0) / 2.0
+
+    nrm[full_mask > 0] = normals
+
+    return nrm

@@ -293,7 +293,7 @@ def write_depth(path, depth, bits=1 , colored=False):
         bits (int) optional: TODO (default 1)
         colored (bool) optional: TODO (default False)
     """
-    # write_pfm(path + ".pfm", depth.astype(np.float32))
+    # write_pfm(path + ".pfm", depth.astype(np.single))
     if colored is True:
         bits = 1
 

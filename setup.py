@@ -23,5 +23,6 @@ setuptools.setup(
         'torch>=2.0.1',
         'torchvision>=0.15.2',
         'tqdm>=4.66.1',
+        'gdown>=4.7.1'
     ]
 )
